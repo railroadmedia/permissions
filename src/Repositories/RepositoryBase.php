@@ -140,14 +140,4 @@ abstract class RepositoryBase
     {
         return $this->connection;
     }
-
-    /**
-     * @param array $columns
-     * @return array
-     */
-    public function getToArray(array $columns = ['*'])
-    {
-        return parent::get($columns)->toArray();
-    }
-
 }

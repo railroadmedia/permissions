@@ -143,9 +143,4 @@ class PermissionServiceTest extends PermissionsTestCase
         $results = $this->classBeingTested->delete(rand());
         $this->assertNull($results);
     }
-
-    public function _test_index(){
-        $results = $this->call('GET', '/');
-
-    }
 }

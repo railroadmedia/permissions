@@ -7,7 +7,6 @@ use Railroad\Permissions\Services\ConfigService;
 
 class PermissionRepository extends RepositoryBase
 {
-
     /**
      * @return mixed
      */

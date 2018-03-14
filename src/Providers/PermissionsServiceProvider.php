@@ -4,8 +4,6 @@ namespace Railroad\Permissions\Providers;
 
 use Illuminate\Database\Events\StatementPrepared;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Routing\Router;
-use Railroad\Permissions\Middleware\PermissionsMiddleware;
 use Railroad\Permissions\Services\ConfigService;
 
 
@@ -49,7 +47,7 @@ class PermissionsServiceProvider extends ServiceProvider
         }
 
         //load package routes file
-       // $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');
+        $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');
 
     }
 

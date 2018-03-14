@@ -6,10 +6,7 @@ use Faker\Generator;
 use Orchestra\Testbench\TestCase as BaseTestCase;
 use Railroad\Permissions\Providers\PermissionsServiceProvider;
 use Carbon\Carbon;
-
 use Illuminate\Auth\AuthManager;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\Connection;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Routing\Router;
@@ -59,13 +56,6 @@ class PermissionsTestCase extends BaseTestCase
      */
     protected function getEnvironmentSetUp($app)
     {
-        // setup package config for testing
-      //  $defaultConfig = require(__DIR__ . '/../config/permissions.php');
-       // $app['config']->set('location.environment', $defaultConfig['environment']);
-        //$app['config']->set('location.testing_ip', $defaultConfig['testing_ip']);
-       // $app['config']->set('location.api', $defaultConfig['api']);
-      //  $app['config']->set('location.active_api', $defaultConfig['active_api']);
-
         // setup package config for testing
         $defaultConfig = require(__DIR__ . '/../config/permissions.php');
 
