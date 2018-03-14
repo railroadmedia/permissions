@@ -12,13 +12,18 @@ class UserPermissionService
 
     /**
      * UserPermissionService constructor.
-     * @param $userPermissionRepository
+     * @param UserPermissionRepository $userPermissionRepository
      */
     public function __construct(UserPermissionRepository $userPermissionRepository)
     {
         $this->userPermissionRepository = $userPermissionRepository;
     }
 
+    /** Give a permission to an user
+     * @param int $permissionId
+     * @param int $userId
+     * @return array
+     */
     public function assignPermissionToUser($permissionId, $userId)
     {
         $userPermissionId = $this->userPermissionRepository->create([
@@ -30,14 +35,29 @@ class UserPermissionService
         return $this->userPermissionRepository->getById($userPermissionId);
     }
 
-    public function revokeUserPermission($userPermissionId)
+    /** Revoke an user permission. Return null if the user permission not exist
+     * @param integer $userId
+     * @param string $permissionSlug
+     * @return bool|null
+     */
+    public function revokeUserPermission($userId, $permissionSlug)
     {
-        $userPermission = $this->userPermissionRepository->getById($userPermissionId);
+        $userPermission = $this->userPermissionRepository->getUserPermission($userId, $permissionSlug);
         if (!$userPermission) {
             return null;
         }
 
-        return $this->userPermissionRepository->delete($userPermissionId);
+        return $this->userPermissionRepository->delete($userPermission['id']);
+    }
+
+    /** Check if the user has the permission assigned
+     * @param integer $userId
+     * @param string $permissionSlug
+     * @return bool
+     */
+    public function userHasPermission($userId, $permissionSlug)
+    {
+        return $this->userPermissionRepository->getUserPermission($userId, $permissionSlug) > 0;
     }
 
 }

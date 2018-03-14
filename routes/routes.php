@@ -16,3 +16,14 @@ Route::delete(
     '/permission/{permissionId}',
     Railroad\Permissions\Controllers\PermissionJsonController::class . '@delete'
 )->name('permission.delete');
+
+Route::put(
+    '/assign-permission',
+    Railroad\Permissions\Controllers\UserPermissionJsonController::class . '@assignPermissionToUser'
+)->name('permission.assign');
+
+Route::delete(
+    '/user-permission',
+    Railroad\Permissions\Controllers\UserPermissionJsonController::class . '@revokeUserPermission'
+)->name('permission.revoke');
+

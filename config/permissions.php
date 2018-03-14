@@ -7,6 +7,7 @@ return [
     'data_mode' => 'host',
 
     'table_prefix' => 'permissions_',
+    'table_users' => 'users',
 
     'brand' => 'drumeo'
 ];

@@ -22,12 +22,18 @@ class UserPermissionServiceTest extends PermissionsTestCase
      */
     protected $userPermissionFactory;
 
+    /**
+     * @var PermissionFactory
+     */
+    protected $permissionFactory;
+
     protected function setUp()
     {
         parent::setUp();
         $this->classBeingTested = $this->app->make(UserPermissionService::class);
         $this->permissionFactory = $this->app->make(PermissionFactory::class);
         $this->userPermissionFactory = $this->app->make(UserPermissionFactory::class);
+
     }
 
     public function test_assign_permission_to_user()
@@ -58,9 +64,10 @@ class UserPermissionServiceTest extends PermissionsTestCase
 
     public function test_revoke_user_permission()
     {
-        $userPermission = $this->userPermissionFactory->store();
+        $permission = $this->permissionFactory->store();
+        $userPermission = $this->userPermissionFactory->store($permission['id']);
 
-        $results = $this->classBeingTested->revokeUserPermission($userPermission['id']);
+        $results = $this->classBeingTested->revokeUserPermission($userPermission['user_id'], $permission['slug']);
 
         $this->assertTrue($results);
 
@@ -76,8 +83,23 @@ class UserPermissionServiceTest extends PermissionsTestCase
 
     public function test_revoke_user_pemission_when_not_exist()
     {
-        $results = $this->classBeingTested->revokeUserPermission(rand());
+        $results = $this->classBeingTested->revokeUserPermission(rand(), rand());
 
         $this->assertNull($results);
+    }
+
+    public function test_user_has_permission_when_permission_exist()
+    {
+        $permission = $this->permissionFactory->store();
+        $userPermission = $this->userPermissionFactory->store($permission['id']);
+
+        $results = $this->classBeingTested->userHasPermission($userPermission['user_id'], $permission['slug']);
+        $this->assertTrue($results);
+    }
+
+    public function test_user_has_permission_when_permission_not_exist()
+    {
+        $results = $this->classBeingTested->userHasPermission(rand(), $this->faker->slug);
+        $this->assertFalse($results);
     }
 }

@@ -11,7 +11,8 @@ use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Routing\Router;
 use Railroad\Permissions\Repositories\RepositoryBase;
-use Railroad\Railcontent\Tests\Resources\Models\User;
+use Railroad\Permissions\Services\ConfigService;
+use Railroad\Permissions\Tests\Resources\Models\User;
 
 
 class PermissionsTestCase extends BaseTestCase
@@ -64,6 +65,7 @@ class PermissionsTestCase extends BaseTestCase
         $app['config']->set('permissions.table_prefix', $defaultConfig['table_prefix']);
         $app['config']->set('permissions.data_mode', $defaultConfig['data_mode']);
         $app['config']->set('permissions.brand', $defaultConfig['brand']);
+        $app['config']->set('permissions.table_users', $defaultConfig['table_users']);
 
         // setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'testbench');
@@ -114,6 +116,27 @@ class PermissionsTestCase extends BaseTestCase
         // register provider
         $app->register(PermissionsServiceProvider::class);
     }
+
+    /**
+     * @return int
+     */
+    public function createAndLogInNewUser()
+    {
+        $userId = $this->databaseManager->connection()->query()->from(ConfigService::$tableUser)->insertGetId(
+            ['email' => $this->faker->email]
+        );
+
+        $this->authManager->guard()->onceUsingId($userId);
+
+        request()->setUserResolver(
+            function () use ($userId) {
+                return User::query()->find($userId);
+            }
+        );
+
+        return $userId;
+    }
+
 
     protected function tearDown()
     {

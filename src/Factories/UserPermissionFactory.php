@@ -3,7 +3,6 @@
 namespace Railroad\Permissions\Factories;
 
 use Faker\Generator;
-use Railroad\Permissions\Services\ConfigService;
 use Railroad\Permissions\Services\UserPermissionService;
 
 class UserPermissionFactory extends UserPermissionService

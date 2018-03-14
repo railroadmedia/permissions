@@ -42,6 +42,11 @@ class ConfigService
     /**
      * @var string
      */
+    public static $tableUser;
+
+    /**
+     * @var string
+     */
     public static $brand;
 
 
