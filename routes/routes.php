@@ -42,5 +42,14 @@ Route::delete(
     Railroad\Permissions\Controllers\RoleJsonController::class . '@delete'
 )->name('role.delete');
 
+Route::put(
+    '/assign-user-role',
+    Railroad\Permissions\Controllers\UserRoleJsonController::class . '@assignRoleToUser'
+)->name('user.role.assign');
+
+Route::delete(
+    '/user-role',
+    Railroad\Permissions\Controllers\UserRoleJsonController::class . '@revokeUserRole'
+)->name('user.role.revoke');
 
 

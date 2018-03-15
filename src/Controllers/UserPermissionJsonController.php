@@ -13,7 +13,7 @@ use Railroad\Permissions\Services\UserPermissionService;
 class UserPermissionJsonController extends Controller
 {
     /**
-     * @var PermissionService
+     * @var UserPermissionService
      */
     private $userPermissionService;
 
