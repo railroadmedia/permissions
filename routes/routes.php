@@ -20,10 +20,27 @@ Route::delete(
 Route::put(
     '/assign-permission',
     Railroad\Permissions\Controllers\UserPermissionJsonController::class . '@assignPermissionToUser'
-)->name('permission.assign');
+)->name('user.permission.assign');
 
 Route::delete(
     '/user-permission',
     Railroad\Permissions\Controllers\UserPermissionJsonController::class . '@revokeUserPermission'
-)->name('permission.revoke');
+)->name('user.permission.revoke');
+
+Route::put(
+    '/role',
+    Railroad\Permissions\Controllers\RoleJsonController::class . '@store'
+)->name('role.store');
+
+Route::patch(
+    '/role/{roleId}',
+    Railroad\Permissions\Controllers\RoleJsonController::class . '@update'
+)->name('role.update');
+
+Route::delete(
+    '/role/{roleId}',
+    Railroad\Permissions\Controllers\RoleJsonController::class . '@delete'
+)->name('role.delete');
+
+
 
