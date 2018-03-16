@@ -32,27 +32,22 @@ class ConfigService
     /**
      * @var string
      */
-    public static $tablePermissions;
-
-    /**
-     * @var string
-     */
-    public static $tableUserPermission;
-
-    /**
-     * @var string
-     */
     public static $tableUser;
 
     /**
      * @var string
      */
-    public static $tableRole;
+    public static $tableAbility;
 
     /**
      * @var string
      */
-    public static $tableUserRole;
+    public static $tableUserAbility;
+
+    /**
+     * @var string
+     */
+    public static $tableAbilityHierarchy;
 
     /**
      * @var string

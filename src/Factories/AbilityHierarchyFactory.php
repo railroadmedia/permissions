@@ -3,10 +3,10 @@
 namespace Railroad\Permissions\Factories;
 
 use Faker\Generator;
+use Railroad\Permissions\Services\AbilityHierarchyService;
 use Railroad\Permissions\Services\UserPermissionService;
-use Railroad\Permissions\Services\UserRoleService;
 
-class UserRoleFactory extends UserRoleService
+class AbilityHierarchyFactory extends AbilityHierarchyService
 {
     /**
      * @var Generator
@@ -14,8 +14,8 @@ class UserRoleFactory extends UserRoleService
     protected $faker;
 
     public function store(
-        $roleId = null,
-        $userId = null
+        $parentId = null,
+        $childId = null
     ) {
         $this->faker = app(Generator::class);
 
@@ -24,6 +24,6 @@ class UserRoleFactory extends UserRoleService
                 rand(),
                 rand()
             ];
-        return parent::assignRoleToUser(...$parameters);
+        return parent::saveAbilityHierarchy(...$parameters);
     }
 }

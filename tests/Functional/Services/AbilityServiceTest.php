@@ -1,41 +1,46 @@
 <?php
 
-
 namespace Railroad\Permissions\Tests\Functional;
 
 use Carbon\Carbon;
-use Railroad\Permissions\Factories\RoleFactory;
+use Railroad\Permissions\Factories\PermissionFactory;
 use Railroad\Permissions\Services\ConfigService;
-use Railroad\Permissions\Services\RoleService;
+use Railroad\Permissions\Services\AbilityService;
 use Railroad\Permissions\Tests\PermissionsTestCase;
 
-class RoleServiceTest extends PermissionsTestCase
+class AbilityServiceTest extends PermissionsTestCase
 {
     /**
-     * @var RoleService
+     * @var AbilityService
      */
     protected $classBeingTested;
 
     /**
-     * @var RoleFactory
+     * @var PermissionFactory
      */
-    protected $roleFactory;
+    protected $permissionFactory;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->classBeingTested = $this->app->make(RoleService::class);
-        $this->roleFactory = $this->app->make(RoleFactory::class);
+        $this->classBeingTested = $this->app->make(AbilityService::class);
+        $this->permissionFactory = $this->app->make(PermissionFactory::class);
     }
 
-    public function test_store()
+    public function test_store_ability()
     {
         $name = $this->faker->word;
         $slug = $this->faker->slug;
+        $type = $this->faker->randomElement([
+            AbilityService::ROLE_TYPE,
+            AbilityService::PERMISSION_TYPE
+        ]);
         $description = $this->faker->text;
+
         $results = $this->classBeingTested->store(
             $name,
             $slug,
+            $type,
             $description
         );
 
@@ -43,6 +48,7 @@ class RoleServiceTest extends PermissionsTestCase
             'id' => 1,
             'name' => $name,
             'slug' => $slug,
+            'type' => $type,
             'description' => $description,
             'brand' => ConfigService::$brand,
             'created_on' => Carbon::now()->toDateTimeString(),
@@ -50,7 +56,7 @@ class RoleServiceTest extends PermissionsTestCase
         ], $results);
 
         $this->assertDatabaseHas(
-            ConfigService::$tableRole,
+            ConfigService::$tableAbility,
             [
                 'id' => 1,
                 'name' => $name,
@@ -65,10 +71,10 @@ class RoleServiceTest extends PermissionsTestCase
 
     public function test_get_by_Id()
     {
-        $role = $this->roleFactory->store();
-        $results = $this->classBeingTested->getById($role['id']);
+        $permission = $this->permissionFactory->store();
+        $results = $this->classBeingTested->getById($permission['id']);
 
-        $this->assertEquals($role, $results);
+        $this->assertEquals($permission, $results);
     }
 
     public function test_get_by_id_not_exist()
@@ -80,39 +86,39 @@ class RoleServiceTest extends PermissionsTestCase
 
     public function test_update()
     {
-        $role = $this->roleFactory->store();
-
+        $permission = $this->permissionFactory->store();
         $newName = $this->faker->word;
 
-        $results = $this->classBeingTested->update($role['id'], [
+        $results = $this->classBeingTested->update($permission['id'], [
             'name' => $newName
         ]);
-
         $this->assertEquals([
-            'id' => $role['id'],
+            'id' => $permission['id'],
             'name' => $newName,
-            'slug' => $role['slug'],
-            'description' => $role['description'],
+            'slug' => $permission['slug'],
+            'type' => $permission['type'],
+            'description' => $permission['description'],
             'brand' => ConfigService::$brand,
-            'created_on' => $role['created_on'],
+            'created_on' => $permission['created_on'],
             'updated_on' => Carbon::now()->toDateTimeString()
         ], $results);
 
         $this->assertDatabaseHas(
-            ConfigService::$tableRole,
+            ConfigService::$tableAbility,
             [
-                'id' => $role['id'],
+                'id' => $permission['id'],
                 'name' => $newName,
-                'slug' => $role['slug'],
-                'description' => $role['description'],
-                'brand' => $role['brand'],
-                'created_on' => $role['created_on'],
+                'slug' => $permission['slug'],
+                'type' => $permission['type'],
+                'description' => $permission['description'],
+                'brand' => $permission['brand'],
+                'created_on' => $permission['created_on'],
                 'updated_on' => Carbon::now()->toDateTimeString()
             ]
         );
     }
 
-    public function test_update_not_existing_role()
+    public function test_update_not_existing_permission()
     {
         $results = $this->classBeingTested->update(rand(), []);
 
@@ -121,26 +127,27 @@ class RoleServiceTest extends PermissionsTestCase
 
     public function test_delete()
     {
-        $role = $this->roleFactory->store();
-        $results = $this->classBeingTested->delete($role['id']);
+        $permission = $this->permissionFactory->store();
+        $results = $this->classBeingTested->delete($permission['id']);
 
         $this->assertTrue($results);
 
         $this->assertDatabaseMissing(
-            ConfigService::$tableRole,
+            ConfigService::$tableAbility,
             [
-                'id' => $role['id'],
-                'name' => $role['name'],
-                'slug' => $role['slug'],
-                'description' => $role['description'],
-                'brand' => $role['brand'],
-                'created_on' => $role['created_on'],
+                'id' => $permission['id'],
+                'name' => $permission['name'],
+                'slug' => $permission['slug'],
+                'type' => $permission['type'],
+                'description' => $permission['description'],
+                'brand' => $permission['brand'],
+                'created_on' => $permission['created_on'],
                 'updated_on' => Carbon::now()->toDateTimeString()
             ]
         );
     }
 
-    public function test_delete_when_not_exist_role()
+    public function test_delete_when_not_exist_permission()
     {
         $results = $this->classBeingTested->delete(rand());
         $this->assertNull($results);

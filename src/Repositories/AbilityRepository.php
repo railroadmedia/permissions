@@ -5,13 +5,14 @@ namespace Railroad\Permissions\Repositories;
 
 use Railroad\Permissions\Services\ConfigService;
 
-class PermissionRepository extends RepositoryBase
+class AbilityRepository extends RepositoryBase
 {
     /**
      * @return mixed
      */
     protected function query()
     {
-        return $this->connection()->table(ConfigService::$tablePermissions);
+        return $this->connection()->table(ConfigService::$tableAbility);
     }
+
 }

@@ -4,52 +4,42 @@ use Illuminate\Support\Facades\Route;
 
 Route::put(
     '/permission',
-    Railroad\Permissions\Controllers\PermissionJsonController::class . '@store'
+    Railroad\Permissions\Controllers\AbilityJsonController::class . '@storePermission'
 )->name('permission.store');
-
-Route::patch(
-    '/permission/{permissionId}',
-    Railroad\Permissions\Controllers\PermissionJsonController::class . '@update'
-)->name('permission.update');
-
-Route::delete(
-    '/permission/{permissionId}',
-    Railroad\Permissions\Controllers\PermissionJsonController::class . '@delete'
-)->name('permission.delete');
-
-Route::put(
-    '/assign-permission',
-    Railroad\Permissions\Controllers\UserPermissionJsonController::class . '@assignPermissionToUser'
-)->name('user.permission.assign');
-
-Route::delete(
-    '/user-permission',
-    Railroad\Permissions\Controllers\UserPermissionJsonController::class . '@revokeUserPermission'
-)->name('user.permission.revoke');
 
 Route::put(
     '/role',
-    Railroad\Permissions\Controllers\RoleJsonController::class . '@store'
+    Railroad\Permissions\Controllers\AbilityJsonController::class . '@storeRole'
 )->name('role.store');
 
 Route::patch(
-    '/role/{roleId}',
-    Railroad\Permissions\Controllers\RoleJsonController::class . '@update'
-)->name('role.update');
+    '/ability/{abilityId}',
+    Railroad\Permissions\Controllers\AbilityJsonController::class . '@update'
+)->name('ability.update');
 
 Route::delete(
-    '/role/{roleId}',
-    Railroad\Permissions\Controllers\RoleJsonController::class . '@delete'
-)->name('role.delete');
+    '/ability/{abilityId}',
+    Railroad\Permissions\Controllers\AbilityJsonController::class . '@delete'
+)->name('ability.delete');
 
 Route::put(
-    '/assign-user-role',
-    Railroad\Permissions\Controllers\UserRoleJsonController::class . '@assignRoleToUser'
-)->name('user.role.assign');
+    '/user-ability',
+    Railroad\Permissions\Controllers\UserAbilityJsonController::class . '@assignAbilityToUser'
+)->name('user.ability.assign');
 
 Route::delete(
-    '/user-role',
-    Railroad\Permissions\Controllers\UserRoleJsonController::class . '@revokeUserRole'
-)->name('user.role.revoke');
+    '/user-ability',
+    Railroad\Permissions\Controllers\UserAbilityJsonController::class . '@revokeUserAbility'
+)->name('user.ability.revoke');
 
+
+Route::put(
+    '/ability-hierarchy',
+    Railroad\Permissions\Controllers\AbilityHierarchyJsonController::class . '@saveAbilityHierarchy'
+)->name('ability.hierarchy.store');
+
+Route::delete(
+    '/ability-hierarchy',
+    Railroad\Permissions\Controllers\AbilityHierarchyJsonController::class . '@deleteAbilityHierarchy'
+)->name('ability.hierarchy.delete');
 

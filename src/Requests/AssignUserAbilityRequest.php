@@ -3,7 +3,9 @@
 namespace Railroad\Permissions\Requests;
 
 
-class RoleUpdateRequest extends FormRequest
+use Railroad\Permissions\Services\ConfigService;
+
+class AssignUserAbilityRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +25,8 @@ class RoleUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'nullable|max:255',
-            'slug' =>'nullable|max:255',
-            'description' => 'nullable|max:255',
-            'brand' => 'nullable|max:255'
+            'user_id' => 'required|exists:'.ConfigService::$tableUser.',id',
+            'ability_id' =>'required|exists:'.ConfigService::$tableAbility.',id'
         ];
     }
 }

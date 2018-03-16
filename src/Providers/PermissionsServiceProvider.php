@@ -74,12 +74,11 @@ class PermissionsServiceProvider extends ServiceProvider
 
         // tables
         ConfigService::$tablePrefix = config('permissions.table_prefix');
-
-        ConfigService::$tablePermissions = ConfigService::$tablePrefix . 'permissions';
-        ConfigService::$tableUserPermission = ConfigService::$tablePrefix . 'user_permission';
         ConfigService::$tableUser = config('permissions.table_users');
-        ConfigService::$tableRole = ConfigService::$tablePrefix.'role';
-        ConfigService::$tableUserRole = ConfigService::$tablePrefix. 'user_role';
+
+        ConfigService::$tableAbility = ConfigService::$tablePrefix . 'ability';
+        ConfigService::$tableUserAbility = ConfigService::$tablePrefix. 'user_ability';
+        ConfigService::$tableAbilityHierarchy = ConfigService::$tablePrefix . 'ability_hierarchy';
 
         ConfigService::$brand = config('permissions.brand');
     }

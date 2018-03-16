@@ -4,10 +4,11 @@ namespace Railroad\Permissions\Factories;
 
 
 use Faker\Generator;
+use Railroad\Permissions\Services\AbilityService;
 use Railroad\Permissions\Services\ConfigService;
 use Railroad\Permissions\Services\RoleService;
 
-class RoleFactory extends RoleService
+class RoleFactory extends AbilityService
 {
     /**
      * @var Generator
@@ -17,6 +18,7 @@ class RoleFactory extends RoleService
     public function store(
         $name = '',
         $slug = '',
+        $type = '',
         $description = '',
         $brand = ''
     ) {
@@ -26,6 +28,7 @@ class RoleFactory extends RoleService
             func_get_args() + [
                 $this->faker->word,
                 $this->faker->slug,
+                AbilityService::ROLE_TYPE,
                 $this->faker->text,
                 ConfigService::$brand
             ];

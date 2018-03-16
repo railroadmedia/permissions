@@ -3,9 +3,9 @@
 namespace Railroad\Permissions\Factories;
 
 use Faker\Generator;
-use Railroad\Permissions\Services\UserPermissionService;
+use Railroad\Permissions\Services\UserAbilityService;
 
-class UserPermissionFactory extends UserPermissionService
+class UserAbilityFactory extends UserAbilityService
 {
     /**
      * @var Generator
@@ -13,7 +13,7 @@ class UserPermissionFactory extends UserPermissionService
     protected $faker;
 
     public function store(
-        $permissionId = null,
+        $abilityId = null,
         $userId = null
     ) {
         $this->faker = app(Generator::class);
@@ -23,6 +23,6 @@ class UserPermissionFactory extends UserPermissionService
                 rand(),
                 rand()
             ];
-        return parent::assignPermissionToUser(...$parameters);
+        return parent::assignAbilityToUser(...$parameters);
     }
 }
