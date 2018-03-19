@@ -3,9 +3,9 @@
 namespace Railroad\Permissions\Factories;
 
 use Faker\Generator;
-use Railroad\Permissions\Services\UserAbilityService;
+use Railroad\Permissions\Services\UserAccessService;
 
-class UserAbilityFactory extends UserAbilityService
+class UserAccessFactory extends UserAccessService
 {
     /**
      * @var Generator
@@ -23,6 +23,6 @@ class UserAbilityFactory extends UserAbilityService
                 rand(),
                 rand()
             ];
-        return parent::assignAbilityToUser(...$parameters);
+        return parent::assignAccessToUser(...$parameters);
     }
 }

@@ -37,17 +37,17 @@ class ConfigService
     /**
      * @var string
      */
-    public static $tableAbility;
+    public static $tableAccess;
 
     /**
      * @var string
      */
-    public static $tableUserAbility;
+    public static $tableUserAccess;
 
     /**
      * @var string
      */
-    public static $tableAbilityHierarchy;
+    public static $tableAccessHierarchy;
 
     /**
      * @var string

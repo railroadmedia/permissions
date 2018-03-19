@@ -5,7 +5,7 @@ namespace Railroad\Permissions\Requests;
 
 use Railroad\Permissions\Services\ConfigService;
 
-class AssignUserAbilityRequest extends FormRequest
+class AccessHierarchyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,8 +25,8 @@ class AssignUserAbilityRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required|exists:'.ConfigService::$tableUser.',id',
-            'ability_id' =>'required|exists:'.ConfigService::$tableAbility.',id'
+            'parent_id' => 'required|exists:'.ConfigService::$tableAccess.',id',
+            'child_id' =>'required|exists:'.ConfigService::$tableAccess.',id'
         ];
     }
 }

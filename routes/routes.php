@@ -3,43 +3,38 @@
 use Illuminate\Support\Facades\Route;
 
 Route::put(
-    '/permission',
-    Railroad\Permissions\Controllers\AbilityJsonController::class . '@storePermission'
-)->name('permission.store');
-
-Route::put(
-    '/role',
-    Railroad\Permissions\Controllers\AbilityJsonController::class . '@storeRole'
-)->name('role.store');
+    '/access',
+    Railroad\Permissions\Controllers\AccessJsonController::class . '@store'
+)->name('access.store');
 
 Route::patch(
-    '/ability/{abilityId}',
-    Railroad\Permissions\Controllers\AbilityJsonController::class . '@update'
-)->name('ability.update');
+    '/access/{accessId}',
+    Railroad\Permissions\Controllers\AccessJsonController::class . '@update'
+)->name('access.update');
 
 Route::delete(
-    '/ability/{abilityId}',
-    Railroad\Permissions\Controllers\AbilityJsonController::class . '@delete'
-)->name('ability.delete');
+    '/access/{accessId}',
+    Railroad\Permissions\Controllers\AccessJsonController::class . '@delete'
+)->name('access.delete');
 
 Route::put(
-    '/user-ability',
-    Railroad\Permissions\Controllers\UserAbilityJsonController::class . '@assignAbilityToUser'
-)->name('user.ability.assign');
+    '/user-access',
+    Railroad\Permissions\Controllers\UserAccessJsonController::class . '@assignAccessToUser'
+)->name('user.access.assign');
 
 Route::delete(
-    '/user-ability',
-    Railroad\Permissions\Controllers\UserAbilityJsonController::class . '@revokeUserAbility'
-)->name('user.ability.revoke');
+    '/user-access',
+    Railroad\Permissions\Controllers\UserAccessJsonController::class . '@revokeUserAccess'
+)->name('user.access.revoke');
 
 
 Route::put(
-    '/ability-hierarchy',
-    Railroad\Permissions\Controllers\AbilityHierarchyJsonController::class . '@saveAbilityHierarchy'
-)->name('ability.hierarchy.store');
+    '/access-hierarchy',
+    Railroad\Permissions\Controllers\AccessHierarchyJsonController::class . '@saveAccessHierarchy'
+)->name('access.hierarchy.store');
 
 Route::delete(
-    '/ability-hierarchy',
-    Railroad\Permissions\Controllers\AbilityHierarchyJsonController::class . '@deleteAbilityHierarchy'
-)->name('ability.hierarchy.delete');
+    '/access-hierarchy',
+    Railroad\Permissions\Controllers\AccessHierarchyJsonController::class . '@deleteAccessHierarchy'
+)->name('access.hierarchy.delete');
 

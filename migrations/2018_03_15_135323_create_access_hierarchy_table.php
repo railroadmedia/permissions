@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 use Railroad\Permissions\Services\ConfigService;
 
 
-class CreateAbilityHierarchyTable extends Migration
+class CreateAccessHierarchyTable extends Migration
 {
     /**
      * Run the migrations.
@@ -16,7 +16,7 @@ class CreateAbilityHierarchyTable extends Migration
     public function up()
     {
         Schema::connection(ConfigService::$databaseConnectionName)->create(
-            ConfigService::$tableAbilityHierarchy,
+            ConfigService::$tableAccessHierarchy,
             function(Blueprint $table) {
                 $table->increments('id');
                 $table->integer('parent_id');
@@ -34,6 +34,6 @@ class CreateAbilityHierarchyTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(ConfigService::$tableAbilityHierarchy);
+        Schema::dropIfExists(ConfigService::$tableAccessHierarchy);
     }
 }

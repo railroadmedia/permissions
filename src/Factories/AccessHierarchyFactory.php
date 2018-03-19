@@ -3,10 +3,9 @@
 namespace Railroad\Permissions\Factories;
 
 use Faker\Generator;
-use Railroad\Permissions\Services\AbilityHierarchyService;
-use Railroad\Permissions\Services\UserPermissionService;
+use Railroad\Permissions\Services\AccessHierarchyService;
 
-class AbilityHierarchyFactory extends AbilityHierarchyService
+class AccessHierarchyFactory extends AccessHierarchyService
 {
     /**
      * @var Generator
@@ -24,6 +23,6 @@ class AbilityHierarchyFactory extends AbilityHierarchyService
                 rand(),
                 rand()
             ];
-        return parent::saveAbilityHierarchy(...$parameters);
+        return parent::saveAccessHierarchy(...$parameters);
     }
 }

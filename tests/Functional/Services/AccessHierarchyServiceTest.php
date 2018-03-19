@@ -3,42 +3,37 @@
 namespace Railroad\Permissions\Tests\Functional;
 
 use Carbon\Carbon;
-use Railroad\Permissions\Factories\PermissionFactory;
+use Railroad\Permissions\Factories\AccessFactory;
 use Railroad\Permissions\Factories\RoleFactory;
-use Railroad\Permissions\Factories\AbilityHierarchyFactory;
+use Railroad\Permissions\Factories\AccessHierarchyFactory;
 use Railroad\Permissions\Services\ConfigService;
-use Railroad\Permissions\Services\AbilityHierarchyService;
+use Railroad\Permissions\Services\AccessHierarchyService;
 use Railroad\Permissions\Tests\PermissionsTestCase;
 
-class AbilityHierarchyServiceTest extends PermissionsTestCase
+class AccessHierarchyServiceTest extends PermissionsTestCase
 {
     /**
-     * @var AbilityHierarchyService
+     * @var AccessHierarchyService
      */
     protected $classBeingTested;
 
     /**
-     * @var AbilityHierarchyFactory
+     * @var AccessHierarchyFactory
      */
-    protected $abilityHierarchyFactory;
+    protected $accessHierarchyFactory;
 
     /**
-     * @var PermissionFactory
+     * @var AccessFactory
      */
-    protected $permissionFactory;
+    protected $accessFactory;
 
-    /**
-     * @var RoleFactory
-     */
-    protected $roleFactory;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->classBeingTested = $this->app->make(AbilityHierarchyService::class);
-        $this->permissionFactory = $this->app->make(PermissionFactory::class);
-        $this->abilityHierarchyFactory = $this->app->make(AbilityHierarchyFactory::class);
-        $this->roleFactory = $this->app->make(RoleFactory::class);
+        $this->classBeingTested = $this->app->make(AccessHierarchyService::class);
+        $this->accessFactory = $this->app->make(AccessFactory::class);
+        $this->accessHierarchyFactory = $this->app->make(AccessHierarchyFactory::class);
     }
 
     public function test_assign_permission_to_role()
@@ -46,7 +41,7 @@ class AbilityHierarchyServiceTest extends PermissionsTestCase
         $permissionId = rand();
         $roleId = rand();
 
-        $results = $this->classBeingTested->saveAbilityHierarchy($permissionId, $roleId);
+        $results = $this->classBeingTested->saveAccessHierarchy($permissionId, $roleId);
 
         $this->assertEquals([
             'id' => 1,
@@ -57,7 +52,7 @@ class AbilityHierarchyServiceTest extends PermissionsTestCase
         ], $results);
 
         $this->assertDatabaseHas(
-            ConfigService::$tableAbilityHierarchy,
+            ConfigService::$tableAccessHierarchy,
             [
                 'id' => 1,
                 'parent_id' => $permissionId,
@@ -70,17 +65,17 @@ class AbilityHierarchyServiceTest extends PermissionsTestCase
 
     public function test_revoke_role_permission()
     {
-        $permission = $this->permissionFactory->store();
-        $role = $this->roleFactory->store();
+        $permission = $this->accessFactory->store();
+        $role = $this->accessFactory->store();
 
-        $rolePermission = $this->abilityHierarchyFactory->store($permission['id'], $role['id']);
+        $rolePermission = $this->accessHierarchyFactory->store($permission['id'], $role['id']);
 
-        $results = $this->classBeingTested->deleteAbilityHierarchy($permission['id'], $role['id']);
+        $results = $this->classBeingTested->deleteAccessHierarchy($permission['id'], $role['id']);
 
         $this->assertTrue($results);
 
         $this->assertDatabaseMissing(
-            ConfigService::$tableAbilityHierarchy,
+            ConfigService::$tableAccessHierarchy,
             [
                 'id' => $rolePermission['id'],
                 'child_id' => $role['id'],
@@ -91,25 +86,25 @@ class AbilityHierarchyServiceTest extends PermissionsTestCase
 
     public function test_revoke_role_pemission_when_not_exist()
     {
-        $results = $this->classBeingTested->deleteAbilityHierarchy(rand(), rand());
+        $results = $this->classBeingTested->deleteAccessHierarchy(rand(), rand());
 
         $this->assertNull($results);
     }
 
     public function test_role_has_permission_when_permission_exist()
     {
-        $permission = $this->permissionFactory->store();
-        $role = $this->roleFactory->store();
-        $this->abilityHierarchyFactory->store($permission['id'], $role['id']);
+        $permission = $this->accessFactory->store();
+        $role = $this->accessFactory->store();
+        $this->accessHierarchyFactory->store($permission['id'], $role['id']);
 
-        $results = $this->classBeingTested->abilityHasChild($permission['id'], $role['id']);
+        $results = $this->classBeingTested->accessHasChild($permission['id'], $role['id']);
 
         $this->assertTrue($results);
     }
 
     public function test_role_has_permission_when_permission_not_exist()
     {
-        $results = $this->classBeingTested->abilityHasChild(rand(), rand());
+        $results = $this->classBeingTested->accessHasChild(rand(), rand());
 
         $this->assertFalse($results);
     }

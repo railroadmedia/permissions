@@ -3,44 +3,40 @@
 namespace Railroad\Permissions\Tests\Functional;
 
 use Carbon\Carbon;
-use Railroad\Permissions\Factories\PermissionFactory;
+use Railroad\Permissions\Factories\AccessFactory;
 use Railroad\Permissions\Services\ConfigService;
-use Railroad\Permissions\Services\AbilityService;
+use Railroad\Permissions\Services\AccessService;
 use Railroad\Permissions\Tests\PermissionsTestCase;
 
-class AbilityServiceTest extends PermissionsTestCase
+class AccessServiceTest extends PermissionsTestCase
 {
     /**
-     * @var AbilityService
+     * @var AccessService
      */
     protected $classBeingTested;
 
     /**
-     * @var PermissionFactory
+     * @var AccessFactory
      */
     protected $permissionFactory;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->classBeingTested = $this->app->make(AbilityService::class);
-        $this->permissionFactory = $this->app->make(PermissionFactory::class);
+        $this->classBeingTested = $this->app->make(AccessService::class);
+        $this->permissionFactory = $this->app->make(AccessFactory::class);
     }
 
     public function test_store_ability()
     {
         $name = $this->faker->word;
         $slug = $this->faker->slug;
-        $type = $this->faker->randomElement([
-            AbilityService::ROLE_TYPE,
-            AbilityService::PERMISSION_TYPE
-        ]);
+
         $description = $this->faker->text;
 
         $results = $this->classBeingTested->store(
             $name,
             $slug,
-            $type,
             $description
         );
 
@@ -48,7 +44,6 @@ class AbilityServiceTest extends PermissionsTestCase
             'id' => 1,
             'name' => $name,
             'slug' => $slug,
-            'type' => $type,
             'description' => $description,
             'brand' => ConfigService::$brand,
             'created_on' => Carbon::now()->toDateTimeString(),
@@ -56,7 +51,7 @@ class AbilityServiceTest extends PermissionsTestCase
         ], $results);
 
         $this->assertDatabaseHas(
-            ConfigService::$tableAbility,
+            ConfigService::$tableAccess,
             [
                 'id' => 1,
                 'name' => $name,
@@ -96,7 +91,6 @@ class AbilityServiceTest extends PermissionsTestCase
             'id' => $permission['id'],
             'name' => $newName,
             'slug' => $permission['slug'],
-            'type' => $permission['type'],
             'description' => $permission['description'],
             'brand' => ConfigService::$brand,
             'created_on' => $permission['created_on'],
@@ -104,12 +98,11 @@ class AbilityServiceTest extends PermissionsTestCase
         ], $results);
 
         $this->assertDatabaseHas(
-            ConfigService::$tableAbility,
+            ConfigService::$tableAccess,
             [
                 'id' => $permission['id'],
                 'name' => $newName,
                 'slug' => $permission['slug'],
-                'type' => $permission['type'],
                 'description' => $permission['description'],
                 'brand' => $permission['brand'],
                 'created_on' => $permission['created_on'],
@@ -133,12 +126,11 @@ class AbilityServiceTest extends PermissionsTestCase
         $this->assertTrue($results);
 
         $this->assertDatabaseMissing(
-            ConfigService::$tableAbility,
+            ConfigService::$tableAccess,
             [
                 'id' => $permission['id'],
                 'name' => $permission['name'],
                 'slug' => $permission['slug'],
-                'type' => $permission['type'],
                 'description' => $permission['description'],
                 'brand' => $permission['brand'],
                 'created_on' => $permission['created_on'],

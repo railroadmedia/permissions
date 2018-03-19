@@ -4,41 +4,35 @@
 namespace Railroad\Permissions\Tests\Functional\Controllers;
 
 use Carbon\Carbon;
-use Railroad\Permissions\Factories\PermissionFactory;
+use Railroad\Permissions\Factories\AccessFactory;
 use Railroad\Permissions\Factories\RoleFactory;
-use Railroad\Permissions\Factories\AbilityHierarchyFactory;
+use Railroad\Permissions\Factories\AccessHierarchyFactory;
 use Railroad\Permissions\Services\ConfigService;
 use Railroad\Permissions\Tests\PermissionsTestCase;
 
-class AbilityHierarchyJsonControllerTest extends PermissionsTestCase
+class AccessHierarchyJsonControllerTest extends PermissionsTestCase
 {
     /**
-     * @var PermissionFactory
+     * @var AccessFactory
      */
-    protected $permissionFactory;
+    protected $accessFactory;
 
     /**
-     * @var RoleFactory
+     * @var AccessHierarchyFactory
      */
-    protected $roleFactory;
-
-    /**
-     * @var AbilityHierarchyFactory
-     */
-    protected $abilityHierarchyFactory;
+    protected $accessHierarchyFactory;
 
     protected function setUp()
     {
         parent::setUp();
-        $this->permissionFactory = $this->app->make(PermissionFactory::class);
-        $this->roleFactory = $this->app->make(RoleFactory::class);
-        $this->abilityHierarchyFactory = $this->app->make(AbilityHierarchyFactory::class);
+        $this->accessFactory = $this->app->make(AccessFactory::class);
+        $this->accessHierarchyFactory = $this->app->make(AccessHierarchyFactory::class);
     }
 
 
     public function test_create_ability_hierarchy_validation()
     {
-        $results = $this->call('PUT', 'ability-hierarchy', []);
+        $results = $this->call('PUT', 'access-hierarchy', []);
 
         $this->assertEquals(422, $results->getStatusCode());
 
@@ -56,10 +50,10 @@ class AbilityHierarchyJsonControllerTest extends PermissionsTestCase
 
     public function test_assign_permission_to_role()
     {
-        $permission = $this->permissionFactory->store();
-        $role = $this->roleFactory->store();
+        $permission = $this->accessFactory->store();
+        $role = $this->accessFactory->store();
 
-        $results = $this->call('PUT', 'ability-hierarchy', [
+        $results = $this->call('PUT', 'access-hierarchy', [
             'parent_id' => $permission['id'],
             'child_id' => $role['id']
         ]);
@@ -75,7 +69,7 @@ class AbilityHierarchyJsonControllerTest extends PermissionsTestCase
         ], $results->decodeResponseJson()['results']);
 
         $this->assertDatabaseHas(
-            ConfigService::$tableAbilityHierarchy,
+            ConfigService::$tableAccessHierarchy,
             [
                 'id' => 1,
                 'parent_id' => $permission['id'],
@@ -86,7 +80,7 @@ class AbilityHierarchyJsonControllerTest extends PermissionsTestCase
 
     public function test_revoke_role_permission_not_exist()
     {
-        $results = $this->call('DELETE', 'ability-hierarchy', [
+        $results = $this->call('DELETE', 'access-hierarchy', [
             'parent_id' => rand()
         ]);
 
@@ -106,11 +100,11 @@ class AbilityHierarchyJsonControllerTest extends PermissionsTestCase
 
     public function test_revoke_role_permission()
     {
-        $permission = $this->permissionFactory->store();
-        $role = $this->roleFactory->store();
-        $abilityHierarchy = $this->abilityHierarchyFactory->store($permission['id'], $role['id']);
+        $permission = $this->accessFactory->store();
+        $role = $this->accessFactory->store();
+        $abilityHierarchy = $this->accessHierarchyFactory->store($permission['id'], $role['id']);
 
-        $results = $this->call('DELETE', 'ability-hierarchy', [
+        $results = $this->call('DELETE', 'access-hierarchy', [
             'parent_id' => $permission['id'],
             'child_id' => $role['id']
         ]);
@@ -118,7 +112,7 @@ class AbilityHierarchyJsonControllerTest extends PermissionsTestCase
         $this->assertEquals(204, $results->getStatusCode());
 
         $this->assertDatabaseMissing(
-            ConfigService::$tableAbilityHierarchy,
+            ConfigService::$tableAccessHierarchy,
             [
                 'id' => $abilityHierarchy['id'],
                 'parent_id' => $permission['id'],

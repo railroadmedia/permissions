@@ -5,7 +5,7 @@ namespace Railroad\Permissions\Repositories;
 
 use Railroad\Permissions\Services\ConfigService;
 
-class AbilityHierarchyRepository extends RepositoryBase
+class AccessHierarchyRepository extends RepositoryBase
 {
     /**
      * @return mixed
@@ -13,15 +13,15 @@ class AbilityHierarchyRepository extends RepositoryBase
     protected function query()
     {
         return $this->connection()
-            ->table(ConfigService::$tableAbilityHierarchy);
+            ->table(ConfigService::$tableAccessHierarchy);
     }
 
-    public function getAbilityChildren($parentId)
+    public function getAccessChildren($parentId)
     {
         return $this->query()->whereIn('parent_id' , $parentId)->get()->toArray();
     }
 
-    public function getAbilityChild($parentId, $childId)
+    public function getAccessChild($parentId, $childId)
     {
         return $this->query()->where(['parent_id' => $parentId,
             'child_id' => $childId])->get()->first();

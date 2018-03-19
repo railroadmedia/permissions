@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 use Railroad\Permissions\Services\ConfigService;
 
 
-class CreateUserAbilityTable extends Migration
+class CreateAccessTable extends Migration
 {
     /**
      * Run the migrations.
@@ -16,11 +16,13 @@ class CreateUserAbilityTable extends Migration
     public function up()
     {
         Schema::connection(ConfigService::$databaseConnectionName)->create(
-            ConfigService::$tableUserAbility,
+            ConfigService::$tableAccess,
             function(Blueprint $table) {
                 $table->increments('id');
-                $table->integer('ability_id');
-                $table->integer('user_id');
+                $table->string('name');
+                $table->string('slug')->unique();
+                $table->text('description')->nullable();
+                $table->string('brand')->index();
                 $table->dateTime('created_on')->index();
                 $table->dateTime('updated_on')->index()->nullable();
             }
@@ -34,6 +36,7 @@ class CreateUserAbilityTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(ConfigService::$tableUserAbility);
+        Schema::dropIfExists(ConfigService::$tableAccess);
+
     }
 }
