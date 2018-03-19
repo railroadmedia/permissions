@@ -16,7 +16,7 @@ class PermissionsServiceProvider extends ServiceProvider
      */
 
     protected $middlewares = [
-        //'permission' => \Railroad\Permissions\Middleware\PermissionsMiddleware::class,
+        'permission' => \Railroad\Permissions\Middleware\PermissionsMiddleware::class,
     ];
 
     /**
