@@ -3,7 +3,8 @@
 namespace Railroad\Permissions\Middleware;
 
 
-use Railroad\Permissions\Repositories\AccessRepository;
+use Railroad\Permissions\Exceptions\NotAllowedException;
+use Railroad\Permissions\Repositories\UserAccessRepository;
 
 class PermissionsMiddleware
 {
@@ -13,7 +14,7 @@ class PermissionsMiddleware
      * PermissionsMiddleware constructor.
      * @param $accessRepository
      */
-    public function __construct(AccessRepository $accessRepository)
+    public function __construct(UserAccessRepository $accessRepository)
     {
         $this->accessRepository = $accessRepository;
     }
@@ -27,25 +28,20 @@ class PermissionsMiddleware
      */
     public function handle($request, \Closure $next)
     {
-        // Check if a user is logged in.
-         if (!$user = $request->user())
-         {
-             return $next($request);
-         }
-
         // Get the current route.
         $route = $request->route();
 
         // Get the current route actions.
         $actions = $route->getAction();
 
-        if(in_array('isOwner', $actions['permissions'])){
-            if($this->accessRepository->isOwner($request->user()->id, $route->parameter('id'), $actions['table'])){
-                return $next($request);
-            }
-            else{
-                return abort(404);
-            }
+           // Check if a user is logged in.
+         if ((!$user = $request->user()) && (!empty($actions['permissions'])))
+         {
+             throw new NotAllowedException('This action is unauthorized.');
+         }
+
+        if(!$this->accessRepository->can($request->user()->id, $actions, $route->parameterNames())){
+            throw new NotAllowedException('This action is unauthorized.');
         }
 
         return $next($request);

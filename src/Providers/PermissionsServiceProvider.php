@@ -51,6 +51,12 @@ class PermissionsServiceProvider extends ServiceProvider
             ]
         );
 
+        // Append the country settings
+        $this->mergeConfigFrom(
+            __DIR__ . '/../../config/permissions.php', 'permissions'
+        );
+
+
         if (ConfigService::$dataMode == 'host') {
             $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
         }
@@ -76,9 +82,9 @@ class PermissionsServiceProvider extends ServiceProvider
         ConfigService::$tablePrefix = config('permissions.table_prefix');
         ConfigService::$tableUser = config('permissions.table_users');
 
-        ConfigService::$tableAccess = ConfigService::$tablePrefix . 'access';
-        ConfigService::$tableUserAccess = ConfigService::$tablePrefix. 'user_access';
-        ConfigService::$tableAccessHierarchy = ConfigService::$tablePrefix . 'access_hierarchy';
+        ConfigService::$tableAccess =  'access';
+        ConfigService::$tableUserAccess =  'user_access';
+        ConfigService::$tableAccessHierarchy =  'access_hierarchy';
 
         ConfigService::$brand = config('permissions.brand');
     }

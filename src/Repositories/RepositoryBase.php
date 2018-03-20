@@ -128,16 +128,7 @@ abstract class RepositoryBase
         return $this->query()->where(['id' => $id])->first();
     }
 
-    public function isOwner($userId, $id, $table = false)
-    {
-        if(!$table){
-            return false;
-        }
-        return $this->query()->from($table)->where([
-            'user_id' => $userId,
-            'id' => $id
-        ])->count() > 0;
-    }
+
     /**
      * @return Builder
      */
