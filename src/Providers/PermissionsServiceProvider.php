@@ -56,10 +56,7 @@ class PermissionsServiceProvider extends ServiceProvider
             __DIR__ . '/../../config/permissions.php', 'permissions'
         );
 
-
-        if (ConfigService::$dataMode == 'host') {
-            $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
-        }
+        $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
 
         //load package routes file
         $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');

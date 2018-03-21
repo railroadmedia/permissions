@@ -32,7 +32,7 @@ class UserAccessRepository extends RepositoryBase
             ->query()
             ->restrictUserIdAccess($userId)
             ->restrictByAccessSlug($abilitySlug)
-            ->get()->toArray();
+            ->get()->first();
     }
 
     /** Check if user it's owner of the record with id
@@ -41,15 +41,18 @@ class UserAccessRepository extends RepositoryBase
      * @param string|false $table
      * @return bool
      */
-    public function isOwner($userId, $id, $table = false)
+    public function isOwner($userId, $id, $routeName)
     {
+        $table = config('table_names')[$routeName];
+        $columnName = config('column_names')[$routeName];
+
         if (!$table) {
             return false;
         }
 
         return $this->query()->from($table)->where([
                 'user_id' => $userId,
-                'id' => $id
+                $columnName ?? 'id' => $id
             ])->count() > 0;
     }
 
@@ -59,10 +62,16 @@ class UserAccessRepository extends RepositoryBase
      * @param $parameterNames
      * @return bool
      */
-    public function can($userId, $actions, $parameterNames)
+    public function can($userId, $actions, $parameterNames = '')
     {
+        if (empty($parameterNames)) {
+            $parameterNames = current(request()->all());
+        } else {
+            $parameterNames = request($parameterNames['0']);
+        }
+
         if (in_array('isOwner', $actions['permissions'])) {
-            if ($this->isOwner($userId, request($parameterNames['0']), config('table_names')[$actions['as']])) {
+            if ($this->isOwner($userId, $parameterNames, $actions['as'])) {
                 return true;
             }
         }

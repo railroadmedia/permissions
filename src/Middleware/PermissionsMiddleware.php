@@ -37,7 +37,7 @@ class PermissionsMiddleware
            // Check if a user is logged in.
          if ((!$user = $request->user()) && (!empty($actions['permissions'])))
          {
-             throw new NotAllowedException('This action is unauthorized.');
+             throw new NotAllowedException('This action is unauthorized. Please login');
          }
 
         if(!$this->accessRepository->can($request->user()->id, $actions, $route->parameterNames())){
