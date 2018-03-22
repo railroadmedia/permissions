@@ -8,7 +8,7 @@ Require the package in your composer.json and update your dependency with compos
 
 ## API Reference
 
-###endpoints
+### endpoints
 
 Prepend all endpoints below with '/permissions'.
 
@@ -32,10 +32,10 @@ Methods
 
 | param            | data-type | required  | optional  |
 |------------------|-----------|-----------|-----------|
-| name\*           | string    |    x      |           |
-| slug\*           | string    |    x      |           |
-| description      | string    |           |     x     |
-| brand            | string    |           |     x     |
+| name\*           | string    |     x     |           |
+| slug\*           | string    |     x     |           |
+| description      | string    |           |      x    |
+| brand            | string    |           |      x    |
 
 
 
