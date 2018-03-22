@@ -6,6 +6,10 @@ This package it's an API that allows admin to manage access rules and user acces
 
 Require the package in your composer.json and update your dependency with composer update.
 
+``
+ "railroad/permissions" : "@dev"
+``
+
 ## API Reference
 
 ### endpoints
