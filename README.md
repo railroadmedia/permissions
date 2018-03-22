@@ -100,7 +100,24 @@ Methods
 }
 ```
 
+#### Returns, when the access not exist
 
+* status code `404`
+* status  `error`
+* `error` array
+
+```json
+{
+    "status":"error",
+    "code":404,
+    "total_results":0,
+    "results":{},
+    "error":{
+        "title": "Not found.",
+        "detail": "Update failed, access not found with id: {accessId}"
+    }
+}
+```
 ------------------------------------------------------------------------------------------------------------------------
 
 ### delete access
@@ -122,6 +139,24 @@ Methods
 }
 ```
 
+#### Returns, when the access not exist
+
+* status code `404`
+* status  `error`
+* `error` array
+
+```json
+{
+    "status":"error",
+    "code":404,
+    "total_results":0,
+    "results":{},
+    "error":{
+        "title": "Not found.",
+        "detail": "Delete failed, access not found with id: {accessId}"
+    }
+}
+```
 
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -166,7 +201,7 @@ Methods
 | param            | data-type | required  | optional  |
 |------------------|-----------|-----------|-----------|
 | user_id          | integer   |    x      |           |
-| access_id        | integer   |    x      |           |
+| access_slug      |  string   |    x      |           |
 
 
 
@@ -184,12 +219,30 @@ Methods
 }
 ```
 
+#### Returns, when the user access not exist
+
+* status code `404`
+* status  `error`
+* `error` array
+
+```json
+{
+    "status":"error",
+    "code":404,
+    "total_results":0,
+    "results":{},
+    "error":{
+        "title": "Not found.",
+        "detail": "Delete failed, user have not access to: {accessSlug}"
+    }
+}
+```
 
 ------------------------------------------------------------------------------------------------------------------------
 
 ### create access hierarchy
 
-**PUT** "user-access"
+**PUT** "access-hierarchy"
 
 | param            | data-type | required  | optional  |
 |------------------|-----------|-----------|-----------|
@@ -223,7 +276,7 @@ Methods
 
 ### delete access hierarchy
 
-**DELETE** "user-access"
+**DELETE** "access-hierarchy"
 
 | param            | data-type | required  | optional  |
 |------------------|-----------|-----------|-----------|
@@ -246,10 +299,51 @@ Methods
 }
 ```
 
+#### Returns, when the access hierarchy not exist
+
+* status code `404`
+* status  `error`
+* `error` array
+
+```json
+{
+    "status":"error",
+    "code":404,
+    "total_results":0,
+    "results":{},
+    "error":{
+        "title": "Not found.",
+        "detail": "Delete failed, access have not the child:  {childId}"
+    }
+}
+```
 
 ------------------------------------------------------------------------------------------------------------------------
 
 
+Validation Errors
+------------------------------------------------------------------------------------------------------------------------
 
+The package use Form Request Validation classes that contain validation logic and the incoming form request is validated before the controller method is called. 
 
+All the validation errors are available in the JSON response's ```errors``` array.
 
+Example:
+
+```json
+{
+ "status":"error",
+ "code": 422,
+  "total_results": 0,
+  "results":{},
+  "errors":{
+    "0": {
+      "source":"name",
+      "detail":"The name field is required."
+    },
+    "1":{
+      "source":"slug",
+      "detail":"The slug field is required."
+    }
+  }
+}  
