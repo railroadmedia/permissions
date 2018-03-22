@@ -347,3 +347,89 @@ Example:
     }
   }
 }  
+```
+
+------------------------------------------------------------------------------------------------------------------------
+
+
+Protecting Routes using middleware
+------------------------------------------------------------------------------------------------------------------------
+
+The package comes with PermissionMiddleware middleware that it's registered automatically as 'permission'. With the middleware you can easly filter your router by user access rights.
+
+In order to protect a route you have to specify the 'permission' middleware on the route you'd like to protect and specify the access rules slugs as an array. 
+
+Example:
+
+```
+  Route::patch(
+            '/address/{id}',
+            [
+                'uses' => Railroad\Ecommerce\Controllers\AddressJsonController::class . '@update',
+                'middleware' => ['permission'],
+                'permissions' => ['admin','editor',isOwner'],
+            ]
+        )->name('address.update');
+```
+
+When the route is requested it will check if the currently logged in user has ``admin`` or the ``editor`` role or it's the `owner` of the given address. 
+
+If the user has access to the given resource then the controller will be called as normal.
+
+If there is not logged in user and the route should be protected an error it's returned in the JSON response's ```errors``` array:
+
+```json
+{
+ "status":"error",
+ "code": 403,
+  "total_results": 0,
+  "results":{},
+  "error":{
+      "title":"Not allowed.",
+      "detail":"This action is unauthorized. Please login"  
+  }
+}  
+```
+
+If the logged in user have not access to the protected route an error it's returned in the JSON response's ```errors``` array:
+
+```json
+{
+ "status":"error",
+ "code": 403,
+  "total_results": 0,
+  "results":{},
+  "error":{
+      "title":"Not allowed.",
+      "detail":"This action is unauthorized."  
+  }
+}  
+```
+
+### Ownership verification
+
+The concept of ownership is used to allow users to perform actions on resources they 'own'.
+
+It's ``required`` to create the configuration file in order to use the package middleware `isOwner` permission.
+ 
+The configuration file should be located in the config directory and should contain:
+* an associative array with the route name and table name (with key `table_names`). This array should contain the mapping between route names and table names for all the routes that are protected with ``isOwner`` permission.
+* an associative array with the route name and the primary key that should be checked (with key `column_names`). By default the package will check against `id` primary key. You do not have to pass in all column names; only the ones that are not ``id``.
+
+Example:
+
+````php
+return [
+    'table_names' => [
+        'address.update' => 'ecommerce_address',
+        'address.delete' => 'ecommerce_address',
+        'payment-method.update' => 'ecommerce_user_payment_methods',
+        'payment-method.delete' => 'ecommerce_user_payment_methods',
+    ],
+    'column_names' => [
+        'payment-method.update' => 'payment_method_id',
+        'payment-method.delete' => 'payment_method_id',
+    ]
+];
+````    
+
