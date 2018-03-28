@@ -267,8 +267,8 @@ Methods
     "code":200,
     "results":{
         "id": 1,
-        "access_id": 1,
-        "user_id": 21,
+        "parent_id": 1,
+        "child_id": 21,
         "created_on": "2018-03-22 08:33:55",
         "updated_on": null
     }
