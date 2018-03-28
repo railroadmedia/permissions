@@ -43,8 +43,11 @@ class UserAccessRepository extends RepositoryBase
      */
     public function isOwner($userId, $id, $routeName)
     {
+        $columnName = 'id';
         $table = config('table_names')[$routeName];
-        $columnName = config('column_names')[$routeName];
+        if(array_key_exists($routeName, config('column_names'))){
+            $columnName = config('column_names')[$routeName];
+        }
 
         if (!$table) {
             return false;
@@ -52,7 +55,7 @@ class UserAccessRepository extends RepositoryBase
 
         return $this->query()->from($table)->where([
                 'user_id' => $userId,
-                $columnName ?? 'id' => $id
+                $columnName => $id
             ])->count() > 0;
     }
 
@@ -67,7 +70,7 @@ class UserAccessRepository extends RepositoryBase
         if (empty($parameterNames)) {
             $parameterNames = current(request()->all());
         } else {
-            $parameterNames = request($parameterNames['0']);
+            $parameterNames = request()->route($parameterNames['0']);
         }
 
         if (in_array('isOwner', $actions['permissions'])) {
