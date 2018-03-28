@@ -15,6 +15,13 @@
     "orchestra/testbench": "~3.6",
     "filp/whoops":"~2.1"
   },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Railroad\\Permissions\\Providers\\PermissionsServiceProvider"
+      ]
+    }
+  },
   "autoload": {
     "psr-4": {
       "Railroad\\Permissions\\": "src"
