@@ -33,6 +33,12 @@ class AccessService
      */
     public function store($name, $slug,  $description = '', $brand = null)
     {
+        $permission = $this->accessRepository->getAccessBySlug($slug, $brand);
+
+        if(!empty($permission)){
+            return $this->getById($permission['id']);
+        }
+
         $permissionId = $this->accessRepository->create([
             'name' => $name,
             'slug' => $slug,
@@ -84,6 +90,11 @@ class AccessService
         }
 
         return $this->accessRepository->delete($id);
+    }
+
+    public function getAccessBySlug($accessSlug, $brand = '')
+    {
+        return $this->accessRepository->getAccessBySlug($accessSlug, $brand);
     }
 
 }

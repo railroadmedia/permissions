@@ -15,4 +15,13 @@ class AccessRepository extends RepositoryBase
         return $this->connection()->table(ConfigService::$tableAccess);
     }
 
+    public function getAccessBySlug($accessSlug, $brand =''){
+        return $this->query()->where(
+            [
+                'slug' => $accessSlug,
+                'brand' => $brand ?? ConfigService::$brand
+            ]
+        )->first();
+    }
+
 }
