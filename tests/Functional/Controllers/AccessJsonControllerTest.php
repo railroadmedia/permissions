@@ -29,7 +29,7 @@ class AccessJsonControllerTest extends PermissionsTestCase
             'slug' => $this->faker->slug,
             'description' => $this->faker->text
         ];
-        $results = $this->call('PUT', '/access', $permission);
+        $results = $this->call('PUT', '/permissions/access', $permission);
 
         $this->assertEquals(200, $results->getStatusCode());
         $this->assertEquals(array_merge(
@@ -44,7 +44,7 @@ class AccessJsonControllerTest extends PermissionsTestCase
 
     public function test_store_validation_errors()
     {
-        $results = $this->call('PUT', '/access');
+        $results = $this->call('PUT', 'permissions/access');
 
         $this->assertEquals(422, $results->getStatusCode());
 
@@ -64,7 +64,7 @@ class AccessJsonControllerTest extends PermissionsTestCase
     public function test_update_not_existing_permission()
     {
         $randomId = rand();
-        $results = $this->call('PATCH', '/access/' . $randomId);
+        $results = $this->call('PATCH', 'permissions/access/' . $randomId);
 
         $this->assertEquals(404, $results->getStatusCode());
 
@@ -81,7 +81,7 @@ class AccessJsonControllerTest extends PermissionsTestCase
         $permission = $this->accessFactory->store();
         $updatedName = $this->faker->word;
 
-        $results = $this->call('PATCH', '/access/' . $permission['id'],
+        $results = $this->call('PATCH', 'permissions/access/' . $permission['id'],
             [
                 'name' => $updatedName
             ]);
@@ -101,7 +101,7 @@ class AccessJsonControllerTest extends PermissionsTestCase
     public function test_delete_not_existing_permission()
     {
         $randomId = rand();
-        $results = $this->call('DELETE', '/access/' . $randomId);
+        $results = $this->call('DELETE', 'permissions/access/' . $randomId);
         $this->assertEquals(404, $results->getStatusCode());
 
         $this->assertEquals(
@@ -115,7 +115,7 @@ class AccessJsonControllerTest extends PermissionsTestCase
     public function test_delete()
     {
         $permission = $this->accessFactory->store();
-        $results = $this->call('DELETE', '/access/' . $permission['id']);
+        $results = $this->call('DELETE', 'permissions/access/' . $permission['id']);
 
         $this->assertEquals(204, $results->getStatusCode());
     }

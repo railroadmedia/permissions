@@ -1,4 +1,5 @@
 <?php
+
 namespace Railroad\Permissions\Repositories;
 
 use Illuminate\Database\Connection;
@@ -31,33 +32,30 @@ abstract class RepositoryBase
     {
         $this->databaseManager = app('db');
 
-        if (empty(self::$connectionMask)) {
-            /**
-             * @var $realConnection Connection
-             */
-            $realConnection = app('db')->connection(ConfigService::$databaseConnectionName);
-            $realConfig = $realConnection->getConfig();
+        /**
+         * @var $realConnection Connection
+         */
+        $realConnection = app('db')->connection(ConfigService::$databaseConnectionName);
+        $realConfig = $realConnection->getConfig();
+        $realConfig['name'] = ConfigService::$connectionMaskPrefix . $realConfig['name'];
 
-            $realConfig['name'] = ConfigService::$connectionMaskPrefix . $realConfig['name'];
+        $maskConnection =
+            new Connection(
+                $realConnection->getPdo(),
+                $realConnection->getDatabaseName(),
+                $realConnection->getTablePrefix(),
+                $realConfig
+            );
 
-            $maskConnection =
-                new Connection(
-                    $realConnection->getPdo(),
-                    $realConnection->getDatabaseName(),
-                    $realConnection->getTablePrefix(),
-                    $realConfig
-                );
-
-            if (!empty($realConnection->getSchemaGrammar())) {
-                $maskConnection->setSchemaGrammar($realConnection->getSchemaGrammar());
-            }
-
-            $maskConnection->setQueryGrammar($realConnection->getQueryGrammar());
-            $maskConnection->setEventDispatcher($realConnection->getEventDispatcher());
-            $maskConnection->setPostProcessor($realConnection->getPostProcessor());
-
-            self::$connectionMask = $maskConnection;
+        if (!empty($realConnection->getSchemaGrammar())) {
+            $maskConnection->setSchemaGrammar($realConnection->getSchemaGrammar());
         }
+
+        $maskConnection->setQueryGrammar($realConnection->getQueryGrammar());
+        $maskConnection->setEventDispatcher($realConnection->getEventDispatcher());
+        $maskConnection->setPostProcessor($realConnection->getPostProcessor());
+
+        self::$connectionMask = $maskConnection;
 
         $this->connection = self::$connectionMask;
     }

@@ -31,7 +31,7 @@ class UserAccessJsonControllerTest extends PermissionsTestCase
 
     public function test_assign_access_to_user_validation()
     {
-        $results = $this->call('PUT', 'user-access', []);
+        $results = $this->call('PUT', 'permissions/user-access', []);
         $this->assertEquals(422, $results->getStatusCode());
 
         $this->assertEquals([
@@ -51,7 +51,7 @@ class UserAccessJsonControllerTest extends PermissionsTestCase
         $permission = $this->accessFactory->store();
         $userId = $this->createAndLogInNewUser();
 
-        $results = $this->call('PUT', 'user-access', [
+        $results = $this->call('PUT', 'permissions/user-access', [
             'access_id' => $permission['id'],
             'user_id' => $userId
         ]);
@@ -78,7 +78,7 @@ class UserAccessJsonControllerTest extends PermissionsTestCase
 
     public function test_revoke_user_access_when_not_exist()
     {
-        $results = $this->call('DELETE', 'user-access', [
+        $results = $this->call('DELETE', 'permissions/user-access', [
             'access_slug' => $this->faker->slug
         ]);
 
@@ -102,7 +102,7 @@ class UserAccessJsonControllerTest extends PermissionsTestCase
         $userId = $this->createAndLogInNewUser();
         $userAbility = $this->userAccessFactory->store($permission['id'], $userId);
 
-        $results = $this->call('DELETE', 'user-access', [
+        $results = $this->call('DELETE', 'permissions/user-access', [
             'access_slug' =>$permission['slug'],
             'user_id' => $userId
         ]);

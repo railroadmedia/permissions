@@ -32,7 +32,7 @@ class AccessHierarchyJsonControllerTest extends PermissionsTestCase
 
     public function test_create_ability_hierarchy_validation()
     {
-        $results = $this->call('PUT', 'access-hierarchy', []);
+        $results = $this->call('PUT', 'permissions/access-hierarchy', []);
 
         $this->assertEquals(422, $results->getStatusCode());
 
@@ -53,7 +53,7 @@ class AccessHierarchyJsonControllerTest extends PermissionsTestCase
         $permission = $this->accessFactory->store();
         $role = $this->accessFactory->store();
 
-        $results = $this->call('PUT', 'access-hierarchy', [
+        $results = $this->call('PUT', 'permissions/access-hierarchy', [
             'parent_id' => $permission['id'],
             'child_id' => $role['id']
         ]);
@@ -80,7 +80,7 @@ class AccessHierarchyJsonControllerTest extends PermissionsTestCase
 
     public function test_revoke_role_permission_not_exist()
     {
-        $results = $this->call('DELETE', 'access-hierarchy', [
+        $results = $this->call('DELETE', 'permissions/access-hierarchy', [
             'parent_id' => rand()
         ]);
 
@@ -104,7 +104,7 @@ class AccessHierarchyJsonControllerTest extends PermissionsTestCase
         $role = $this->accessFactory->store();
         $abilityHierarchy = $this->accessHierarchyFactory->store($permission['id'], $role['id']);
 
-        $results = $this->call('DELETE', 'access-hierarchy', [
+        $results = $this->call('DELETE', 'permissions/access-hierarchy', [
             'parent_id' => $permission['id'],
             'child_id' => $role['id']
         ]);

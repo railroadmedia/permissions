@@ -2,7 +2,7 @@
 
 return [
     'cache_duration' => 60 * 60 * 24 * 30,
-    'database_connection_name' => 'mysql',
+    'database_connection_name' => 'testbench',
     'connection_mask_prefix' => 'permissions_',
     'data_mode' => 'host',
 
