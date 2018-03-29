@@ -34,13 +34,15 @@ class PermissionsMiddleware
         // Get the current route actions.
         $actions = $route->getAction();
 
-           // Check if a user is logged in.
-         if ((!$user = $request->user()) && (!empty($actions['permissions'])))
-         {
+        // Check if a user is logged in.
+         if ((!$user = $request->user()) && (!empty($actions['permissions'])) && (empty($request->all())))
+        {
              throw new NotAllowedException('This action is unauthorized. Please login');
          }
 
-        if(!$this->accessRepository->can($request->user()->id, $actions, $route->parameterNames())){
+        $userId = ($request->user()) ? $request->user()->id : null;
+
+        if (!$this->accessRepository->can($userId, $actions, $route->parameterNames())) {
             throw new NotAllowedException('This action is unauthorized.');
         }
 

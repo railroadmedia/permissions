@@ -43,9 +43,24 @@ class UserAccessRepository extends RepositoryBase
      */
     public function isOwner($userId, $id, $routeName)
     {
+        $ownerColumn = 'user_id';
         $columnName = 'id';
         $table = config('table_names')[$routeName];
-        if(array_key_exists($routeName, config('column_names'))){
+
+        if(is_array(config('table_names')[$routeName]))
+        {
+            $table = config('table_names')[$routeName]['user_id'];
+        }
+
+        if ((!$userId) && (request()->filled('customer_id'))) {
+            $ownerColumn = 'customer_id';
+            $userId = request()->get('customer_id');
+            if(is_array(config('table_names')[$routeName])) {
+                $table = config('table_names')[$routeName]['customer_id'];
+            }
+        }
+
+        if (array_key_exists($routeName, config('column_names'))) {
             $columnName = config('column_names')[$routeName];
         }
 
@@ -54,7 +69,7 @@ class UserAccessRepository extends RepositoryBase
         }
 
         return $this->query()->from($table)->where([
-                'user_id' => $userId,
+                $ownerColumn => $userId,
                 $columnName => $id
             ])->count() > 0;
     }
@@ -67,6 +82,7 @@ class UserAccessRepository extends RepositoryBase
      */
     public function can($userId, $actions, $parameterNames = '')
     {
+
         if (empty($parameterNames)) {
             $parameterNames = current(request()->all());
         } else {
@@ -74,6 +90,7 @@ class UserAccessRepository extends RepositoryBase
         }
 
         if (in_array('isOwner', $actions['permissions'])) {
+
             if ($this->isOwner($userId, $parameterNames, $actions['as'])) {
                 return true;
             }
