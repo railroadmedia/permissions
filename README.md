@@ -414,7 +414,7 @@ If the logged in user have not access to the protected route an error it's retur
 
 
 The concept of ownership is used to allow users to perform actions on resources they 'own'. 
-In order to protect a route for ownership you have to specify the 'permission' middleware on the route you'd like to protect and specify the ** 'isOwner'** permission.
+In order to protect a route for ownership you have to specify the 'permission' middleware on the route you'd like to protect and specify the **'isOwner'** permission.
 
 It's ``required`` to create the configuration file in order to use the package middleware `isOwner` permission.
  
