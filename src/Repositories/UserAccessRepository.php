@@ -47,15 +47,14 @@ class UserAccessRepository extends RepositoryBase
         $columnName = 'id';
         $table = config('table_names')[$routeName];
 
-        if(is_array(config('table_names')[$routeName]))
-        {
+        if (is_array(config('table_names')[$routeName])) {
             $table = config('table_names')[$routeName]['user_id'];
         }
 
         if ((!$userId) && (request()->filled('customer_id'))) {
             $ownerColumn = 'customer_id';
             $userId = request()->get('customer_id');
-            if(is_array(config('table_names')[$routeName])) {
+            if (is_array(config('table_names')[$routeName])) {
                 $table = config('table_names')[$routeName]['customer_id'];
             }
         }
@@ -64,13 +63,31 @@ class UserAccessRepository extends RepositoryBase
             $columnName = config('column_names')[$routeName];
         }
 
+        $join = false;
+        if (array_key_exists($routeName, config('additional_join_for_owner'))) {
+            $join = true;
+            $joinTable = config('additional_join_for_owner')[$routeName]['table'];
+            $joinColumn1 = config('additional_join_for_owner')[$routeName]['column1'];
+            $joinColumn2 = config('additional_join_for_owner')[$routeName]['column2'];
+        }
+
         if (!$table) {
             return false;
         }
+        $query = $this->query()->from($table);
 
-        return $this->query()->from($table)->where([
+        if ($join) {
+            $query = $query->leftJoin(
+                $joinTable,
+                $table . '.' . $joinColumn1,
+                '=',
+                $joinTable . '.' . $joinColumn2
+            );
+        }
+
+        return $query->where([
                 $ownerColumn => $userId,
-                $columnName => $id
+                $table . '.' . $columnName => $id
             ])->count() > 0;
     }
 
