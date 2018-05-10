@@ -2,21 +2,25 @@
 
 namespace Railroad\Permissions\Middleware;
 
-
 use Railroad\Permissions\Exceptions\NotAllowedException;
 use Railroad\Permissions\Repositories\UserAccessRepository;
+use Railroad\Permissions\Services\PermissionService;
 
 class PermissionsMiddleware
 {
-    protected $accessRepository;
+    /**
+     * @var PermissionService
+     */
+    private $permissionService;
 
     /**
      * PermissionsMiddleware constructor.
-     * @param $accessRepository
+     *
+     * @param PermissionService $permissionService
      */
-    public function __construct(UserAccessRepository $accessRepository)
+    public function __construct(PermissionService $permissionService)
     {
-        $this->accessRepository = $accessRepository;
+        $this->permissionService = $permissionService;
     }
 
     /**
@@ -25,6 +29,7 @@ class PermissionsMiddleware
      * @param  \Illuminate\Http\Request $request
      * @param  \Closure $next
      * @return mixed
+     * @throws NotAllowedException
      */
     public function handle($request, \Closure $next)
     {
@@ -34,16 +39,25 @@ class PermissionsMiddleware
         // Get the current route actions.
         $actions = $route->getAction();
 
-        // Check if a user is logged in.
-         if ((!$user = $request->user()) && (!empty($actions['permissions'])) && (empty($request->all())))
-        {
-             throw new NotAllowedException('This action is unauthorized. Please login');
-         }
+        // If any required roles or abilities as set, there must be a logged in user
+        if ((!empty($actions['roles']) || !empty($actions['abilities'])) && empty($request->user())) {
+            throw new NotAllowedException('This action is unauthorized. Please login');
+        }
 
-        $userId = ($request->user()) ? $request->user()->id : null;
+        if (!empty($request->user())) {
+            // make sure the user has all the required roles
+            foreach ($actions['roles'] ?? [] as $role) {
+                if (!$this->permissionService->is($request->user()->id, $role)) {
+                    throw new NotAllowedException('This action is unauthorized.');
+                }
+            }
 
-        if (!$this->accessRepository->can($userId, $actions, $route->parameterNames())) {
-            throw new NotAllowedException('This action is unauthorized.');
+            // make sure the user has all the required abilities
+            foreach ($actions['abilities'] ?? [] as $ability) {
+                if (!$this->permissionService->can($request->user()->id, $ability)) {
+                    throw new NotAllowedException('This action is unauthorized.');
+                }
+            }
         }
 
         return $next($request);

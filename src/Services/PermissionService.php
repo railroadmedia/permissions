@@ -2,6 +2,7 @@
 
 namespace Railroad\Permissions\Services;
 
+use Carbon\Carbon;
 use Railroad\Permissions\Repositories\UserAbilityRepository;
 use Railroad\Permissions\Repositories\UserRoleRepository;
 
@@ -16,6 +17,11 @@ class PermissionService
      */
     private $userRoleRepository;
 
+    /**
+     * A memory cache so we only need to make a database query for a user once per request.
+     *
+     * @var array
+     */
     private static $cache = [];
 
     /**
@@ -43,9 +49,6 @@ class PermissionService
             return false;
         }
 
-        $usersRoles = $this->userRoleRepository->query()->where('user_id', $userId)->get();
-        $usersAbilities = $this->userAbilityRepository->query()->where('user_id', $userId)->get();
-
         $this->cache($userId);
 
         return $this->can($userId, $ability);
@@ -71,6 +74,86 @@ class PermissionService
         return false;
     }
 
+    /**
+     * @param int $userId
+     * @param string $ability
+     */
+    public function assignAbility($userId, $ability)
+    {
+        $exists = $this->userAbilityRepository->query()
+            ->where(
+                [
+                    'user_id' => $userId,
+                    'ability' => $ability,
+                ]
+            )
+            ->exists();
+
+        if (!$exists) {
+            $this->userAbilityRepository->create(
+                [
+                    'user_id' => $userId,
+                    'ability' => $ability,
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                    'updated_at' => Carbon::now()->toDateTimeString(),
+                ]
+            );
+
+            $this->clearCache();
+        }
+    }
+
+    /**
+     * @param int $userId
+     * @param string $role
+     */
+    public function assignRole($userId, $role)
+    {
+        $exists = $this->userRoleRepository->query()
+            ->where(
+                [
+                    'user_id' => $userId,
+                    'role' => $role,
+                ]
+            )
+            ->exists();
+
+        if (!$exists) {
+            $this->userRoleRepository->create(
+                [
+                    'user_id' => $userId,
+                    'role' => $role,
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                    'updated_at' => Carbon::now()->toDateTimeString(),
+                ]
+            );
+
+            $this->clearCache();
+        }
+    }
+
+    /**
+     * @param int $userId
+     * @param string $ability
+     */
+    public function revokeAbility($userId, $ability)
+    {
+        $this->userAbilityRepository->query()->where(['user_id' => $userId, 'ability' => $ability])->delete();
+    }
+
+    /**
+     * @param int $userId
+     * @param string $role
+     */
+    public function revokeRole($userId, $role)
+    {
+        $this->userRoleRepository->query()->where(['user_id' => $userId, 'role' => $role])->delete();
+    }
+
+    /**
+     * @param $userId
+     * @return mixed
+     */
     public function getAllUsersAbilities($userId)
     {
         if (isset(self::$cache[$userId]['abilities'])) {
@@ -82,6 +165,9 @@ class PermissionService
         return $this->getAllUsersAbilities($userId);
     }
 
+    /**
+     * @return void
+     */
     public function clearCache()
     {
         self::$cache = [];
