@@ -67,7 +67,7 @@ class UserAccessJsonControllerTest extends PermissionsTestCase
         ], $results->decodeResponseJson()['results']);
 
         $this->assertDatabaseHas(
-            ConfigService::$tableUserAccess,
+            ConfigService::$tableUserAbilities,
             [
                 'id' => 1,
                 'access_id' => $permission['id'],
@@ -110,7 +110,7 @@ class UserAccessJsonControllerTest extends PermissionsTestCase
         $this->assertEquals(204, $results->getStatusCode());
 
         $this->assertDatabaseMissing(
-            ConfigService::$tableUserAccess,
+            ConfigService::$tableUserAbilities,
             [
                 'id' => $userAbility['id'],
                 'access_id' => $permission['id'],

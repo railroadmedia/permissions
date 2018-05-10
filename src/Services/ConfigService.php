@@ -5,6 +5,11 @@ namespace Railroad\Permissions\Services;
 class ConfigService
 {
     /**
+     * @var string
+     */
+    public static $cacheDriver;
+
+    /**
      * @var int
      */
     public static $cacheTime;
@@ -17,12 +22,7 @@ class ConfigService
     /**
      * @var string
      */
-    public static $connectionMaskPrefix;
-
-    /**
-     * @var string
-     */
-    public static $dataMode;
+    public static $databaseMode;
 
     /**
      * @var string
@@ -32,27 +32,17 @@ class ConfigService
     /**
      * @var string
      */
-    public static $tableUser;
+    public static $tableUserAbilities;
 
     /**
      * @var string
      */
-    public static $tableAccess;
+    public static $tableUserRoles;
 
     /**
-     * @var string
+     * @var array
      */
-    public static $tableUserAccess;
-
-    /**
-     * @var string
-     */
-    public static $tableAccessHierarchy;
-
-    /**
-     * @var string
-     */
-    public static $brand;
+    public static $roleAbilities;
 
 
 }

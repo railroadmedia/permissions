@@ -69,7 +69,7 @@ class AccessHierarchyJsonControllerTest extends PermissionsTestCase
         ], $results->decodeResponseJson()['results']);
 
         $this->assertDatabaseHas(
-            ConfigService::$tableAccessHierarchy,
+            ConfigService::$tableUserRoles,
             [
                 'id' => 1,
                 'parent_id' => $permission['id'],
@@ -112,7 +112,7 @@ class AccessHierarchyJsonControllerTest extends PermissionsTestCase
         $this->assertEquals(204, $results->getStatusCode());
 
         $this->assertDatabaseMissing(
-            ConfigService::$tableAccessHierarchy,
+            ConfigService::$tableUserRoles,
             [
                 'id' => $abilityHierarchy['id'],
                 'parent_id' => $permission['id'],

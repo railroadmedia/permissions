@@ -56,7 +56,9 @@ class PermissionsServiceProvider extends ServiceProvider
             __DIR__ . '/../../config/permissions.php', 'permissions'
         );
 
-        $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
+        if (ConfigService::$databaseMode == 'host') {
+            $this->loadMigrationsFrom(__DIR__ . '/../../migrations');
+        }
 
         //load package routes file
         $this->loadRoutesFrom(__DIR__ . '/../../routes/routes.php');
@@ -68,22 +70,20 @@ class PermissionsServiceProvider extends ServiceProvider
     private function setupConfig()
     {
         // caching
+        ConfigService::$cacheDriver = config('permissions.cache_driver');
         ConfigService::$cacheTime = config('permissions.cache_duration');
 
         // database
         ConfigService::$databaseConnectionName = config('permissions.database_connection_name');
-        ConfigService::$connectionMaskPrefix = config('permissions.connection_mask_prefix');
-        ConfigService::$dataMode = config('permissions.data_mode');
+        ConfigService::$databaseMode = config('permissions.database_mode');
 
         // tables
         ConfigService::$tablePrefix = config('permissions.table_prefix');
-        ConfigService::$tableUser = config('permissions.table_users');
+        ConfigService::$tableUserAbilities =  config('permissions.tables.user_abilities');
+        ConfigService::$tableUserRoles =  config('permissions.tables.user_roles');
 
-        ConfigService::$tableAccess =  'access';
-        ConfigService::$tableUserAccess =  'user_access';
-        ConfigService::$tableAccessHierarchy =  'access_hierarchy';
-
-        ConfigService::$brand = config('permissions.brand');
+        // role abilities
+        ConfigService::$roleAbilities = config('permissions.role_abilities');
     }
 
     /**

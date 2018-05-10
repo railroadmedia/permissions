@@ -3,9 +3,7 @@
 namespace Railroad\Permissions\Requests;
 
 
-use Railroad\Permissions\Services\ConfigService;
-
-class AssignUserAccessRequest extends FormRequest
+class UserRoleCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,8 +23,8 @@ class AssignUserAccessRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required|exists:'.ConfigService::$tableUser.',id',
-            'access_id' =>'required|exists:'.ConfigService::$tableAccess.',id'
+            'user_id' => 'required|numeric',
+            'role' =>'required|string|max:191',
         ];
     }
 }

@@ -3,9 +3,7 @@
 namespace Railroad\Permissions\Requests;
 
 
-use Railroad\Permissions\Services\ConfigService;
-
-class RevokeUserAccessRequest extends FormRequest
+class UserRoleUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,8 +23,8 @@ class RevokeUserAccessRequest extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required|exists:'.ConfigService::$tableUser.',id',
-            'access_slug' =>'required|exists:'.ConfigService::$tableAccess.',slug'
+            'user_id' => 'numeric',
+            'role' =>'string|max:191',
         ];
     }
 }

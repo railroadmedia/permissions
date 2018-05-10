@@ -8,17 +8,17 @@ Route::group(
     function () {
         Route::put(
             '/access',
-            Railroad\Permissions\Controllers\AccessJsonController::class . '@store'
+            Railroad\Permissions\Controllers\UserAbilityJsonController::class . '@store'
         )->name('access.store');
 
         Route::patch(
             '/access/{accessId}',
-            Railroad\Permissions\Controllers\AccessJsonController::class . '@update'
+            Railroad\Permissions\Controllers\UserAbilityJsonController::class . '@update'
         )->name('access.update');
 
         Route::delete(
             '/access/{accessId}',
-            Railroad\Permissions\Controllers\AccessJsonController::class . '@delete'
+            Railroad\Permissions\Controllers\UserAbilityJsonController::class . '@delete'
         )->name('access.delete');
 
         Route::put(

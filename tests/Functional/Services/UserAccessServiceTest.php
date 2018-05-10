@@ -50,7 +50,7 @@ class UserAccessServiceTest extends PermissionsTestCase
         ], $results);
 
         $this->assertDatabaseHas(
-            ConfigService::$tableUserAccess,
+            ConfigService::$tableUserAbilities,
             [
                 'id' => 1,
                 'access_id' => $abilityId,
@@ -71,7 +71,7 @@ class UserAccessServiceTest extends PermissionsTestCase
         $this->assertTrue($results);
 
         $this->assertDatabaseMissing(
-            ConfigService::$tableUserAccess,
+            ConfigService::$tableUserAbilities,
             [
                 'id' => $userAbility['id'],
                 'access_id' => $ability['id'],

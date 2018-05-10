@@ -3,7 +3,7 @@
 namespace Railroad\Permissions\Requests;
 
 
-class AccessCreateRequest extends FormRequest
+class UserAbilityUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,10 +23,8 @@ class AccessCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|max:255',
-            'slug' =>'required|max:255',
-            'description' => 'nullable|max:255',
-            'brand' => 'nullable|max:255'
+            'user_id' => 'numeric',
+            'ability' =>'string|max:191',
         ];
     }
 }

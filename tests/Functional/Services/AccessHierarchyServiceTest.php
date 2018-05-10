@@ -52,7 +52,7 @@ class AccessHierarchyServiceTest extends PermissionsTestCase
         ], $results);
 
         $this->assertDatabaseHas(
-            ConfigService::$tableAccessHierarchy,
+            ConfigService::$tableUserRoles,
             [
                 'id' => 1,
                 'parent_id' => $permissionId,
@@ -75,7 +75,7 @@ class AccessHierarchyServiceTest extends PermissionsTestCase
         $this->assertTrue($results);
 
         $this->assertDatabaseMissing(
-            ConfigService::$tableAccessHierarchy,
+            ConfigService::$tableUserRoles,
             [
                 'id' => $rolePermission['id'],
                 'child_id' => $role['id'],
