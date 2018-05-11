@@ -12,6 +12,7 @@ class PermissionService
      * @var UserAbilityRepository
      */
     private $userAbilityRepository;
+
     /**
      * @var UserRoleRepository
      */
@@ -28,12 +29,12 @@ class PermissionService
      * PermissionService constructor.
      *
      * @param UserAbilityRepository $userAbilityRepository
-     * @param UserRoleRepository $userRoleRepository
+     * @param UserRoleRepository    $userRoleRepository
      */
     public function __construct(UserAbilityRepository $userAbilityRepository, UserRoleRepository $userRoleRepository)
     {
         $this->userAbilityRepository = $userAbilityRepository;
-        $this->userRoleRepository = $userRoleRepository;
+        $this->userRoleRepository    = $userRoleRepository;
     }
 
     /**
@@ -43,9 +44,13 @@ class PermissionService
      */
     public function can($userId, $ability)
     {
-        if (isset(self::$cache[$userId]['abilities'][$ability])) {
+
+        if(isset(self::$cache[$userId]['abilities']) && (in_array($ability, self::$cache[$userId]['abilities'])))
+        {
             return true;
-        } elseif (isset(self::$cache[$userId])) {
+        }
+        elseif(isset(self::$cache[$userId]))
+        {
             return false;
         }
 
@@ -61,13 +66,15 @@ class PermissionService
      */
     public function is($userId, $role)
     {
-        if (isset(self::$cache[$userId]['roles'][$role])) {
+        if(isset(self::$cache[$userId]['roles'][$role]))
+        {
             return true;
         }
 
         $usersRoles = $this->userRoleRepository->query()->where('user_id', $userId)->get();
 
-        if ($usersRoles->pluck('role')->search($role) !== false) {
+        if($usersRoles->pluck('role')->search($role) !== false)
+        {
             return true;
         }
 
@@ -75,7 +82,7 @@ class PermissionService
     }
 
     /**
-     * @param int $userId
+     * @param int    $userId
      * @param string $ability
      */
     public function assignAbility($userId, $ability)
@@ -89,11 +96,12 @@ class PermissionService
             )
             ->exists();
 
-        if (!$exists) {
+        if(!$exists)
+        {
             $this->userAbilityRepository->create(
                 [
-                    'user_id' => $userId,
-                    'ability' => $ability,
+                    'user_id'    => $userId,
+                    'ability'    => $ability,
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString(),
                 ]
@@ -104,7 +112,7 @@ class PermissionService
     }
 
     /**
-     * @param int $userId
+     * @param int    $userId
      * @param string $role
      */
     public function assignRole($userId, $role)
@@ -113,16 +121,17 @@ class PermissionService
             ->where(
                 [
                     'user_id' => $userId,
-                    'role' => $role,
+                    'role'    => $role,
                 ]
             )
             ->exists();
 
-        if (!$exists) {
+        if(!$exists)
+        {
             $this->userRoleRepository->create(
                 [
-                    'user_id' => $userId,
-                    'role' => $role,
+                    'user_id'    => $userId,
+                    'role'       => $role,
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString(),
                 ]
@@ -133,7 +142,7 @@ class PermissionService
     }
 
     /**
-     * @param int $userId
+     * @param int    $userId
      * @param string $ability
      */
     public function revokeAbility($userId, $ability)
@@ -142,7 +151,7 @@ class PermissionService
     }
 
     /**
-     * @param int $userId
+     * @param int    $userId
      * @param string $role
      */
     public function revokeRole($userId, $role)
@@ -156,7 +165,8 @@ class PermissionService
      */
     public function getAllUsersAbilities($userId)
     {
-        if (isset(self::$cache[$userId]['abilities'])) {
+        if(isset(self::$cache[$userId]['abilities']))
+        {
             return self::$cache[$userId]['abilities'];
         }
 
@@ -178,21 +188,23 @@ class PermissionService
      */
     private function cache($userId)
     {
-        $usersRoles = $this->userRoleRepository->query()->where('user_id', $userId)->get();
+        $usersRoles     = $this->userRoleRepository->query()->where('user_id', $userId)->get();
         $usersAbilities = $this->userAbilityRepository->query()->where('user_id', $userId)->get();
 
         self::$cache[$userId]['abilities'] = [];
-        self::$cache[$userId]['roles'] = [];
+        self::$cache[$userId]['roles']     = [];
 
-        foreach ($usersRoles->pluck('role') as $usersRole) {
+        foreach($usersRoles->pluck('role') as $usersRole)
+        {
             self::$cache[$userId]['roles'][] = $usersRole;
 
-            foreach (ConfigService::$roleAbilities[$usersRole] as $roleAbility) {
+            foreach(ConfigService::$roleAbilities[$usersRole] as $roleAbility)
+            {
                 self::$cache[$userId]['abilities'][] = $roleAbility;
             }
         }
-
-        foreach ($usersAbilities->pluck('role') as $userAbility) {
+        foreach($usersAbilities->pluck('ability') as $userAbility)
+        {
             self::$cache[$userId]['abilities'][] = $userAbility;
         }
     }

@@ -23,7 +23,7 @@ class CreateUserAbilitiesTable extends Migration
                     $table->increments('id');
 
                     $table->integer('user_id')->index();
-                    $table->integer('ability', 191)->index();
+                    $table->string('ability', 191)->index();
 
                     $table->dateTime('created_at')->index();
                     $table->dateTime('updated_at')->index();

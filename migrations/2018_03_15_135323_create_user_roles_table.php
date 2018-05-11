@@ -21,7 +21,7 @@ class CreateUserRolesTable extends Migration
                 $table->increments('id');
 
                 $table->integer('user_id')->index();
-                $table->integer('role', 191)->index();
+                $table->string('role', 191)->index();
 
                 $table->dateTime('created_at')->index();
                 $table->dateTime('updated_at')->index();

@@ -2,6 +2,7 @@
 
 namespace Railroad\Permissions\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Railroad\Permissions\Exceptions\NotFoundException;
@@ -35,8 +36,13 @@ class UserRoleJsonController extends Controller
     public function store(UserRoleCreateRequest $request)
     {
         $ability = $this->userRoleRepository->create(
-            $request->only(['user_id', 'role'])
-        );
+            array_merge(
+                $request->only(['user_id', 'role']),
+                [
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                    'updated_at' => Carbon::now()->toDateTimeString(),
+                ]
+        ));
 
         return new JsonResponse($ability, 200);
     }

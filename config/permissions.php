@@ -9,8 +9,8 @@ return [
 
     'table_prefix' => 'permissions_',
     'tables' => [
-        'users_abilities' => 'users_abilities',
-        'users_roles' => 'users_roles',
+        'user_abilities' => 'user_abilities',
+        'user_roles' => 'user_roles',
     ],
 
     'role_abilities' => [

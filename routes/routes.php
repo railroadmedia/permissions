@@ -7,39 +7,33 @@ Route::group(
     ],
     function () {
         Route::put(
-            '/access',
+            '/user-ability',
             Railroad\Permissions\Controllers\UserAbilityJsonController::class . '@store'
-        )->name('access.store');
+        )->name('permissions.user-ability.store');
 
         Route::patch(
-            '/access/{accessId}',
+            '/user-ability/{userAbilityId}',
             Railroad\Permissions\Controllers\UserAbilityJsonController::class . '@update'
-        )->name('access.update');
+        )->name('permissions.user-ability.update');
 
         Route::delete(
-            '/access/{accessId}',
+            '/user-ability/{userAbilityId}',
             Railroad\Permissions\Controllers\UserAbilityJsonController::class . '@delete'
-        )->name('access.delete');
+        )->name('permissions.user-ability.delete');
 
         Route::put(
-            '/user-access',
-            Railroad\Permissions\Controllers\UserAccessJsonController::class . '@assignAccessToUser'
-        )->name('user.access.assign');
+            '/user-role',
+            Railroad\Permissions\Controllers\UserRoleJsonController::class . '@store'
+        )->name('permissions.user-role.store');
+
+        Route::patch(
+            '/user-role/{userRoleId}',
+            Railroad\Permissions\Controllers\UserRoleJsonController::class . '@update'
+        )->name('permissions.user-role.update');
 
         Route::delete(
-            '/user-access',
-            Railroad\Permissions\Controllers\UserAccessJsonController::class . '@revokeUserAccess'
-        )->name('user.access.revoke');
-
-
-        Route::put(
-            '/access-hierarchy',
-            Railroad\Permissions\Controllers\AccessHierarchyJsonController::class . '@saveAccessHierarchy'
-        )->name('access.hierarchy.store');
-
-        Route::delete(
-            '/access-hierarchy',
-            Railroad\Permissions\Controllers\AccessHierarchyJsonController::class . '@deleteAccessHierarchy'
-        )->name('access.hierarchy.delete');
+            '/user-role/{userRoleId}',
+            Railroad\Permissions\Controllers\UserRoleJsonController::class . '@delete'
+        )->name('permissions.user-role.delete');
     });
 
