@@ -3,6 +3,8 @@
 namespace Railroad\Permissions\Services;
 
 use Carbon\Carbon;
+use Exception;
+use Railroad\Permissions\Exceptions\NotAllowedException;
 use Railroad\Permissions\Repositories\UserAbilityRepository;
 use Railroad\Permissions\Repositories\UserRoleRepository;
 
@@ -57,6 +59,26 @@ class PermissionService
         $this->cache($userId);
 
         return $this->can($userId, $ability);
+    }
+
+    /**
+     * @param $userId
+     * @param $ability
+     * @param Exception|null $exception
+     * @throws NotAllowedException
+     * @throws Exception
+     */
+    public function canOrThrow($userId, $ability, Exception $exception = null)
+    {
+        if (!$this->can($userId, $ability)) {
+            if (empty($exception)) {
+                throw new NotAllowedException(
+                    'You are not allowed to ' . str_replace('_', ' ', str_replace('.', ' ', $ability))
+                );
+            }
+
+            throw $exception;
+        }
     }
 
     /**
