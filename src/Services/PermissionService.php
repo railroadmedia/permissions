@@ -220,7 +220,7 @@ class PermissionService
         {
             self::$cache[$userId]['roles'][] = $usersRole;
 
-            foreach(ConfigService::$roleAbilities[$usersRole] as $roleAbility)
+            foreach(ConfigService::$roleAbilities[$usersRole] ?? [] as $roleAbility)
             {
                 self::$cache[$userId]['abilities'][] = $roleAbility;
             }
