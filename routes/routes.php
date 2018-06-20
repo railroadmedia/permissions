@@ -26,6 +26,11 @@ Route::group(
             Railroad\Permissions\Controllers\UserRoleJsonController::class . '@store'
         )->name('permissions.user-role.store');
 
+        Route::put(
+            '/user-roles',
+            Railroad\Permissions\Controllers\UserRoleJsonController::class . '@updateOrCreateMultiple'
+        )->name('permissions.user-role.update-or-create-multiple');
+
         Route::patch(
             '/user-role/{userRoleId}',
             Railroad\Permissions\Controllers\UserRoleJsonController::class . '@update'
