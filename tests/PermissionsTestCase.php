@@ -30,7 +30,7 @@ class PermissionsTestCase extends BaseTestCase
     {
         parent::setUp();
 
-        $this->artisan('migrate', []);
+        $this->artisan('migrate:fresh', []);
         $this->artisan('cache:clear', []);
 
         $this->faker           = $this->app->make(Generator::class);
@@ -55,6 +55,11 @@ class PermissionsTestCase extends BaseTestCase
         $app['config']->set('permissions.table_prefix', $defaultConfig['table_prefix']);
         $app['config']->set('permissions.database_mode', $defaultConfig['database_mode']);
         $app['config']->set('permissions.tables', $defaultConfig['tables']);
+
+        $app['config']->set(
+            'permissions.role_abilities',
+            $defaultConfig['role_abilities'] ?? []
+        );
 
         // setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'testbench');

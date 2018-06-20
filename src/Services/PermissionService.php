@@ -230,4 +230,37 @@ class PermissionService
             self::$cache[$userId]['abilities'][] = $userAbility;
         }
     }
+
+    /**
+     * @param int $userId
+     * @param string $ability
+     * @param array $default
+     *
+     * @return array
+     */
+    public function columns($userId, $ability, $default = [])
+    {
+        if (!$this->can($userId, $ability)) {
+            return $default;
+        }
+
+        $columns = [];
+
+        foreach (self::$cache[$userId]['roles'] as $role) {
+
+            $abilityConfig = ConfigService::$roleAbilities[$role] ?? [];
+
+            foreach($abilityConfig as $abilityKey => $abilityValue) {
+
+                if ($ability === $abilityKey && is_array($abilityValue)) {
+
+                    foreach ($abilityValue as $column) {
+                        $columns[$column] = true;
+                    }
+                }
+            }
+        }
+
+        return empty($columns) ? $default : array_keys($columns);
+    }
 }
