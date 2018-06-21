@@ -4,6 +4,7 @@ namespace Railroad\Permissions\Services;
 
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Support\Arr;
 use Railroad\Permissions\Exceptions\NotAllowedException;
 use Railroad\Permissions\Repositories\UserAbilityRepository;
 use Railroad\Permissions\Repositories\UserRoleRepository;
@@ -234,33 +235,58 @@ class PermissionService
     /**
      * @param int $userId
      * @param string $ability
+     * @param array $input
      * @param array $default
      *
      * @return array
      */
-    public function columns($userId, $ability, $default = [])
+    public function columns($userId, $ability, $input, $default = [])
     {
         if (!$this->can($userId, $ability)) {
-            return $default;
+            return Arr::only($input, $default);
         }
 
-        $columns = [];
+        $result = [];
+        $foundConfig = false;
 
         foreach (self::$cache[$userId]['roles'] as $role) {
 
             $abilityConfig = ConfigService::$roleAbilities[$role] ?? [];
 
-            foreach($abilityConfig as $abilityKey => $abilityValue) {
+            if (
+                !empty($abilityConfig) &&
+                isset($abilityConfig[$ability]) &&
+                is_array($abilityConfig[$ability])
+            ) {
 
-                if ($ability === $abilityKey && is_array($abilityValue)) {
+                $rules = $abilityConfig[$ability];
 
-                    foreach ($abilityValue as $column) {
-                        $columns[$column] = true;
+                foreach ($rules as $ruleType => $ruleValues) {
+
+                    if ($ruleValues === '*') {
+
+                        $result += $input;
+
+                    } else if ($ruleType === 'only' && is_array($ruleValues)) {
+
+                        $result += Arr::only($input, $ruleValues);
+
+                    } else if ($ruleType === 'except' && is_array($ruleValues)) {
+
+                        $result += Arr::except($input, $ruleValues);
                     }
                 }
+
+                $foundConfig = true;
+
+                break; // bail after first configured role match
             }
         }
 
-        return empty($columns) ? $default : array_keys($columns);
+        if (!$foundConfig) {
+            $result = Arr::only($input, $default);
+        }
+
+        return $result;
     }
 }

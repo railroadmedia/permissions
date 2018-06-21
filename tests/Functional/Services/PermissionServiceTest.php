@@ -3,6 +3,7 @@
 namespace Railroad\Permissions\Tests\Functional;
 
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 use Railroad\Permissions\Services\ConfigService;
 use Railroad\Permissions\Services\PermissionService;
 use Railroad\Permissions\Tests\PermissionsTestCase;
@@ -218,12 +219,38 @@ class PermissionServiceTest extends PermissionsTestCase
             ]);
     }
 
-    public function test_columns()
+    protected function setupColumnsTestConfig()
     {
         $dateTime = Carbon::instance($this->faker->dateTime)->toDateTimeString();
 
-        // setup administrator role, with the readable test ability 'update-threads'
-        $administratorId = $this->faker->randomNumber();
+        $ability = 'update.users';
+        $usersRolesToIds = [];
+
+        // setup developer role
+        $developerId = rand(1, 32767);
+        $developerRole = 'developer';
+        $role = [
+            'user_id'    => $developerId,
+            'role'       => $developerRole,
+            'created_at' => $dateTime,
+            'updated_at' => $dateTime
+        ];
+        $developerAbility = [
+            'user_id'    => $developerId,
+            'ability'    => $ability,
+            'created_at' => $dateTime,
+            'updated_at' => $dateTime,
+        ];
+
+        $usersRolesToIds[$developerRole] = $developerId;
+
+        $this->databaseManager->table(ConfigService::$tableUserRoles)
+            ->insert($role);
+        $this->databaseManager->table(ConfigService::$tableUserAbilities)
+            ->insert($developerAbility);
+
+        // setup administrator role
+        $administratorId = rand(1, 32767);
         $administratorRole = 'administrator';
         $role = [
             'user_id'    => $administratorId,
@@ -233,18 +260,20 @@ class PermissionServiceTest extends PermissionsTestCase
         ];
         $administratorAbility = [
             'user_id'    => $administratorId,
-            'ability'    => 'update-threads',
+            'ability'    => $ability,
             'created_at' => $dateTime,
             'updated_at' => $dateTime,
         ];
+
+        $usersRolesToIds[$administratorRole] = $administratorId;
 
         $this->databaseManager->table(ConfigService::$tableUserRoles)
             ->insert($role);
         $this->databaseManager->table(ConfigService::$tableUserAbilities)
             ->insert($administratorAbility);
 
-        // setup user role, with the readable test ability 'update-threads'
-        $userId = $this->faker->randomNumber();
+        // setup user role
+        $userId = rand(1, 32767);
         $userRole = 'user';
         $role = [
             'user_id'    => $userId,
@@ -254,50 +283,77 @@ class PermissionServiceTest extends PermissionsTestCase
         ];
         $userAbility = [
             'user_id'    => $userId,
-            'ability'    => 'update-threads',
+            'ability'    => $ability,
             'created_at' => $dateTime,
             'updated_at' => $dateTime,
         ];
+
+        $usersRolesToIds[$userRole] = $userId;
 
         $this->databaseManager->table(ConfigService::$tableUserRoles)
             ->insert($role);
         $this->databaseManager->table(ConfigService::$tableUserAbilities)
             ->insert($userAbility);
 
-        // setup default role, with the readable test ability 'update-threads', only for "->can()" ability test
-        $defaultId = $this->faker->randomNumber();
-        $defaultRole = $this->faker->word;
+        // setup moderator role
+        $moderatorId = rand(1, 32767);
+        $moderatorRole = 'moderator';
+        $role = [
+            'user_id'    => $moderatorId,
+            'role'       => $moderatorRole,
+            'created_at' => $dateTime,
+            'updated_at' => $dateTime
+        ];
+        $moderatorAbility = [
+            'user_id'    => $moderatorId,
+            'ability'    => $ability,
+            'created_at' => $dateTime,
+            'updated_at' => $dateTime,
+        ];
+
+        $usersRolesToIds[$moderatorRole] = $moderatorId;
+
+        $this->databaseManager->table(ConfigService::$tableUserRoles)
+            ->insert($role);
+        $this->databaseManager->table(ConfigService::$tableUserAbilities)
+            ->insert($moderatorAbility);
+
+        // setup a default mode role, no columns configured, only for "->can()" ability test
+        $defaultId = rand(1, 32767);
+        $defaultRole = 'default';
         $role = [
             'user_id'    => $defaultId,
             'role'       => $defaultRole,
             'created_at' => $dateTime,
             'updated_at' => $dateTime
         ];
-        $userAbility = [
+        $moderatorAbility = [
             'user_id'    => $defaultId,
-            'ability'    => 'update-threads',
+            'ability'    => $ability,
             'created_at' => $dateTime,
             'updated_at' => $dateTime,
         ];
 
+        $usersRolesToIds[$defaultRole] = $defaultId;
+
         $this->databaseManager->table(ConfigService::$tableUserRoles)
             ->insert($role);
         $this->databaseManager->table(ConfigService::$tableUserAbilities)
-            ->insert($userAbility);
+            ->insert($moderatorAbility);
 
-        // extend test config, for the ability 'update-threads' we set different columns, for administrator and user roles
+        // extend test columns config
         $configColumnAbilities = [
-            'administrator' => [
-                'update-threads' => [
-                    'category_id',
-                    'author_id',
-                    'title',
-                    'slug',
-                    'pinned',
-                    'locked',
-                    'state',
-                    'post_count',
-                    'published_on',
+            $developerRole => [
+                $ability => [
+                    '*'
+                ]
+            ],
+            $administratorRole => [
+                $ability => [
+                    'except' => [
+                        'id',
+                        'session_salt'
+                    ]
                 ],
                 $this->faker->word,
                 $this->faker->word => [
@@ -306,9 +362,33 @@ class PermissionServiceTest extends PermissionsTestCase
                     $this->faker->word
                 ]
             ],
-            'user' => [
-                'update-threads' => [
-                    'title'
+            $userRole => [
+                $ability => [
+                    'only' => [
+                        'display_name'
+                    ]
+                ],
+                $this->faker->word,
+                $this->faker->word => [
+                    $this->faker->word
+                ],
+                $this->faker->word,
+                $this->faker->word => [
+                    $this->faker->word,
+                    $this->faker->word,
+                    $this->faker->word
+                ]
+            ],
+            $moderatorRole => [
+                $ability => [
+                    '*',
+                    'only' => [
+                        'display_name'
+                    ],
+                    'except' => [
+                        'id',
+                        'session_salt'
+                    ]
                 ],
                 $this->faker->word,
                 $this->faker->word => [
@@ -321,25 +401,126 @@ class PermissionServiceTest extends PermissionsTestCase
                     $this->faker->word
                 ]
             ]
-        ]; // no columns specified for the default role
+        ];
 
         ConfigService::$roleAbilities += $configColumnAbilities;
 
-        $this->assertEquals(
-            $this->classBeingTested->columns($administratorId, 'update-threads'),
-            $configColumnAbilities[$administratorRole]['update-threads']
+        return [$ability, $usersRolesToIds, $configColumnAbilities];
+    }
+
+    public function test_columns_all()
+    {
+        list(
+            $ability,
+            $usersRolesToIds,
+            $configColumnAbilities
+        ) = $this->setupColumnsTestConfig();
+
+        $developerRole = 'developer';
+        $developerId = $usersRolesToIds[$developerRole];
+
+        $unfilteredColumns = [
+            'column1' => $this->faker->randomNumber(),
+            'column2' => $this->faker->randomNumber(),
+            'column3' => $this->faker->randomNumber(),
+            'column4' => $this->faker->randomNumber()
+        ];
+
+        $filteredColumns = $this->classBeingTested
+            ->columns($developerId, $ability, $unfilteredColumns);
+
+        // '*' rule should return all columns
+        $expectedColumns = $unfilteredColumns;
+
+        $this->assertEquals($expectedColumns, $filteredColumns);
+    }
+
+    public function test_columns_except()
+    {
+        list(
+            $ability,
+            $usersRolesToIds,
+            $configColumnAbilities
+        ) = $this->setupColumnsTestConfig();
+
+        $administratorRole = 'administrator';
+        $administratorId = $usersRolesToIds[$administratorRole];
+
+        $unfilteredColumns = [
+            'id' => $this->faker->randomNumber(),
+            'column1' => $this->faker->randomNumber(),
+            'column2' => $this->faker->randomNumber(),
+            'column3' => $this->faker->randomNumber(),
+            'column4' => $this->faker->randomNumber(),
+            'session_salt' => $this->faker->word
+        ];
+
+        $filteredColumns = $this->classBeingTested
+            ->columns($administratorId, $ability, $unfilteredColumns);
+
+        $expectedColumns = Arr::except(
+            $unfilteredColumns,
+            $configColumnAbilities[$administratorRole][$ability]['except']
         );
 
-        $this->assertEquals(
-            $this->classBeingTested->columns($userId, 'update-threads'),
-            $configColumnAbilities[$userRole]['update-threads']
-        );
+        $this->assertEquals($expectedColumns, $filteredColumns);
+    }
 
-        $defaultValue = ['default']; // the default role does not exist in $configColumnAbilities
+    public function test_columns_only()
+    {
+        list(
+            $ability,
+            $usersRolesToIds,
+            $configColumnAbilities
+        ) = $this->setupColumnsTestConfig();
 
-        $this->assertEquals(
-            $this->classBeingTested->columns($defaultId, 'update-threads', $defaultValue),
-            $defaultValue
-        );
+        $userRole = 'user';
+        $userId = $usersRolesToIds[$userRole];
+
+        $unfilteredColumns = [
+            'id' => $this->faker->randomNumber(),
+            'column1' => $this->faker->randomNumber(),
+            'column2' => $this->faker->randomNumber(),
+            'column3' => $this->faker->randomNumber(),
+            'column4' => $this->faker->randomNumber(),
+            'display_name' => $this->faker->word
+        ];
+
+        $filteredColumns = $this->classBeingTested
+            ->columns($userId, $ability, $unfilteredColumns);
+
+        $expectedColumns['display_name'] = $unfilteredColumns['display_name'];
+
+        $this->assertEquals($expectedColumns, $filteredColumns);
+    }
+
+    public function test_columns_default()
+    {
+        list(
+            $ability,
+            $usersRolesToIds,
+            $configColumnAbilities
+        ) = $this->setupColumnsTestConfig();
+
+        $defaultRole = 'default';
+        $defaultId = $usersRolesToIds[$defaultRole];
+
+        $unfilteredColumns = [
+            'id' => $this->faker->randomNumber(),
+            'column1' => $this->faker->randomNumber(),
+            'column2' => $this->faker->randomNumber(),
+            'column3' => $this->faker->randomNumber(),
+            'column4' => $this->faker->randomNumber(),
+            'display_name' => $this->faker->word
+        ];
+
+        $defaultCoumns = ['display_name'];
+
+        $filteredColumns = $this->classBeingTested
+            ->columns($defaultId, $ability, $unfilteredColumns, $defaultCoumns);
+
+        $expectedColumns['display_name'] = $unfilteredColumns['display_name'];
+
+        $this->assertEquals($expectedColumns, $filteredColumns);
     }
 }
