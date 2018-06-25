@@ -14,7 +14,6 @@ use Railroad\Permissions\Repositories\RepositoryBase;
 use Railroad\Permissions\Services\ConfigService;
 use Railroad\Permissions\Tests\Resources\Models\User;
 
-
 class PermissionsTestCase extends BaseTestCase
 {
     /**
@@ -27,24 +26,15 @@ class PermissionsTestCase extends BaseTestCase
      */
     protected $databaseManager;
 
-    /**
-     * @var AuthManager
-     */
-    protected $authManager;
-
     protected function setUp()
     {
         parent::setUp();
 
-        $this->artisan('migrate', []);
+        $this->artisan('migrate:fresh', []);
         $this->artisan('cache:clear', []);
 
-        $this->faker = $this->app->make(Generator::class);
+        $this->faker           = $this->app->make(Generator::class);
         $this->databaseManager = $this->app->make(DatabaseManager::class);
-        $this->authManager = $this->app->make(AuthManager::class);
-        $this->router = $this->app->make(Router::class);
-
-        RepositoryBase::$connectionMask = null;
 
         Carbon::setTestNow(Carbon::now());
     }
@@ -63,25 +53,29 @@ class PermissionsTestCase extends BaseTestCase
         $app['config']->set('permissions.database_connection_name', 'testbench');
         $app['config']->set('permissions.cache_duration', 60);
         $app['config']->set('permissions.table_prefix', $defaultConfig['table_prefix']);
-        $app['config']->set('permissions.data_mode', $defaultConfig['data_mode']);
-        $app['config']->set('permissions.brand', $defaultConfig['brand']);
-        $app['config']->set('permissions.table_users', $defaultConfig['table_users']);
+        $app['config']->set('permissions.database_mode', $defaultConfig['database_mode']);
+        $app['config']->set('permissions.tables', $defaultConfig['tables']);
+
+        $app['config']->set(
+            'permissions.role_abilities',
+            $defaultConfig['role_abilities'] ?? []
+        );
 
         // setup default database to use sqlite :memory:
         $app['config']->set('database.default', 'testbench');
         $app['config']->set(
             'database.connections.mysql',
             [
-                'driver' => 'mysql',
-                'host' => 'mysql',
-                'port' => env('MYSQL_PORT', '3306'),
-                'database' => env('MYSQL_DB','permissions'),
-                'username' => 'root',
-                'password' => 'root',
-                'charset' => 'utf8',
+                'driver'    => 'mysql',
+                'host'      => 'mysql',
+                'port'      => env('MYSQL_PORT', '3306'),
+                'database'  => env('MYSQL_DB', 'permissions'),
+                'username'  => 'root',
+                'password'  => 'root',
+                'charset'   => 'utf8',
                 'collation' => 'utf8_general_ci',
-                'prefix' => '',
-                'options' => [
+                'prefix'    => '',
+                'options'   => [
                     \PDO::ATTR_PERSISTENT => true,
                 ]
             ]
@@ -90,53 +84,15 @@ class PermissionsTestCase extends BaseTestCase
         $app['config']->set(
             'database.connections.testbench',
             [
-                'driver' => 'sqlite',
+                'driver'   => 'sqlite',
                 'database' => ':memory:',
-                'prefix' => '',
+                'prefix'   => '',
             ]
         );
 
-        // allows access to built in user auth
-        $app['config']->set('auth.providers.users.model', User::class);
-
-        // allows access to built in user auth
-        $app['config']->set('auth.providers.users.model', User::class);
-
-
-        if (!$app['db']->connection()->getSchemaBuilder()->hasTable('users')) {
-
-            $app['db']->connection()->getSchemaBuilder()->create(
-                'users',
-                function (Blueprint $table) {
-                    $table->increments('id');
-                    $table->string('email');
-                }
-            );
-        }
         // register provider
         $app->register(PermissionsServiceProvider::class);
     }
-
-    /**
-     * @return int
-     */
-    public function createAndLogInNewUser()
-    {
-        $userId = $this->databaseManager->connection()->query()->from(ConfigService::$tableUser)->insertGetId(
-            ['email' => $this->faker->email]
-        );
-
-        $this->authManager->guard()->onceUsingId($userId);
-
-        request()->setUserResolver(
-            function () use ($userId) {
-                return User::query()->find($userId);
-            }
-        );
-
-        return $userId;
-    }
-
 
     protected function tearDown()
     {

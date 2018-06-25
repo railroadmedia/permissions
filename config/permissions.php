@@ -2,12 +2,25 @@
 
 return [
     'cache_duration' => 60 * 60 * 24 * 30,
+    'cache_driver' => 'array',
+
     'database_connection_name' => 'testbench',
-    'connection_mask_prefix' => 'permissions_',
-    'data_mode' => 'host',
+    'database_mode' => 'host',
 
     'table_prefix' => 'permissions_',
-    'table_users' => 'users',
+    'tables' => [
+        'user_abilities' => 'user_abilities',
+        'user_roles' => 'user_roles',
+    ],
 
-    'brand' => 'drumeo'
+    'role_abilities' => [
+        'role1' => [
+            'ability-1',
+            'ability-2',
+        ],
+        'role2' => [
+            'ability-2',
+            'ability-3',
+        ],
+    ],
 ];
