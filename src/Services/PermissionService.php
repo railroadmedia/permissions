@@ -221,9 +221,13 @@ class PermissionService
         {
             self::$cache[$userId]['roles'][] = $usersRole;
 
-            foreach(ConfigService::$roleAbilities[$usersRole] ?? [] as $roleAbility)
+            foreach(ConfigService::$roleAbilities[$usersRole] ?? [] as $roleAbilityIndex => $roleAbility)
             {
-                self::$cache[$userId]['abilities'][] = $roleAbility;
+                if (is_array($roleAbility)) {
+                    self::$cache[$userId]['abilities'][] = $roleAbilityIndex;
+                } else {
+                    self::$cache[$userId]['abilities'][] = $roleAbility;
+                }
             }
         }
         foreach($usersAbilities->pluck('ability') as $userAbility)
