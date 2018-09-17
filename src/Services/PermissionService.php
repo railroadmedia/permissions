@@ -33,12 +33,12 @@ class PermissionService
      * PermissionService constructor.
      *
      * @param UserAbilityRepository $userAbilityRepository
-     * @param UserRoleRepository    $userRoleRepository
+     * @param UserRoleRepository $userRoleRepository
      */
     public function __construct(UserAbilityRepository $userAbilityRepository, UserRoleRepository $userRoleRepository)
     {
         $this->userAbilityRepository = $userAbilityRepository;
-        $this->userRoleRepository    = $userRoleRepository;
+        $this->userRoleRepository = $userRoleRepository;
     }
 
     /**
@@ -49,12 +49,11 @@ class PermissionService
     public function can($userId, $ability)
     {
 
-        if(isset(self::$cache[$userId]['abilities']) && (in_array($ability, self::$cache[$userId]['abilities'])))
-        {
+        if (isset(self::$cache[$userId]['abilities']) &&
+            (in_array($ability, self::$cache[$userId]['abilities']) ||
+                isset(self::$cache[$userId]['abilities'][$ability]))) {
             return true;
-        }
-        elseif(isset(self::$cache[$userId]))
-        {
+        } elseif (isset(self::$cache[$userId])) {
             return false;
         }
 
@@ -90,15 +89,17 @@ class PermissionService
      */
     public function is($userId, $role)
     {
-        if(isset(self::$cache[$userId]['roles'][$role]))
-        {
+        if (isset(self::$cache[$userId]['roles'][$role])) {
             return true;
         }
 
-        $usersRoles = $this->userRoleRepository->query()->where('user_id', $userId)->get();
+        $usersRoles =
+            $this->userRoleRepository->query()
+                ->where('user_id', $userId)
+                ->get();
 
-        if($usersRoles->pluck('role')->search($role) !== false)
-        {
+        if ($usersRoles->pluck('role')
+                ->search($role) !== false) {
             return true;
         }
 
@@ -106,28 +107,30 @@ class PermissionService
     }
 
     /**
-     * @param int    $userId
+     * @param int $userId
      * @param string $ability
      */
     public function assignAbility($userId, $ability)
     {
-        $exists = $this->userAbilityRepository->query()
-            ->where(
+        $exists =
+            $this->userAbilityRepository->query()
+                ->where(
+                    [
+                        'user_id' => $userId,
+                        'ability' => $ability,
+                    ]
+                )
+                ->exists();
+
+        if (!$exists) {
+            $this->userAbilityRepository->create(
                 [
                     'user_id' => $userId,
                     'ability' => $ability,
-                ]
-            )
-            ->exists();
-
-        if(!$exists)
-        {
-            $this->userAbilityRepository->create(
-                [
-                    'user_id'    => $userId,
-                    'ability'    => $ability,
-                    'created_at' => Carbon::now()->toDateTimeString(),
-                    'updated_at' => Carbon::now()->toDateTimeString(),
+                    'created_at' => Carbon::now()
+                        ->toDateTimeString(),
+                    'updated_at' => Carbon::now()
+                        ->toDateTimeString(),
                 ]
             );
 
@@ -136,28 +139,30 @@ class PermissionService
     }
 
     /**
-     * @param int    $userId
+     * @param int $userId
      * @param string $role
      */
     public function assignRole($userId, $role)
     {
-        $exists = $this->userRoleRepository->query()
-            ->where(
-                [
-                    'user_id' => $userId,
-                    'role'    => $role,
-                ]
-            )
-            ->exists();
+        $exists =
+            $this->userRoleRepository->query()
+                ->where(
+                    [
+                        'user_id' => $userId,
+                        'role' => $role,
+                    ]
+                )
+                ->exists();
 
-        if(!$exists)
-        {
+        if (!$exists) {
             $this->userRoleRepository->create(
                 [
-                    'user_id'    => $userId,
-                    'role'       => $role,
-                    'created_at' => Carbon::now()->toDateTimeString(),
-                    'updated_at' => Carbon::now()->toDateTimeString(),
+                    'user_id' => $userId,
+                    'role' => $role,
+                    'created_at' => Carbon::now()
+                        ->toDateTimeString(),
+                    'updated_at' => Carbon::now()
+                        ->toDateTimeString(),
                 ]
             );
 
@@ -166,21 +171,25 @@ class PermissionService
     }
 
     /**
-     * @param int    $userId
+     * @param int $userId
      * @param string $ability
      */
     public function revokeAbility($userId, $ability)
     {
-        $this->userAbilityRepository->query()->where(['user_id' => $userId, 'ability' => $ability])->delete();
+        $this->userAbilityRepository->query()
+            ->where(['user_id' => $userId, 'ability' => $ability])
+            ->delete();
     }
 
     /**
-     * @param int    $userId
+     * @param int $userId
      * @param string $role
      */
     public function revokeRole($userId, $role)
     {
-        $this->userRoleRepository->query()->where(['user_id' => $userId, 'role' => $role])->delete();
+        $this->userRoleRepository->query()
+            ->where(['user_id' => $userId, 'role' => $role])
+            ->delete();
     }
 
     /**
@@ -189,8 +198,7 @@ class PermissionService
      */
     public function getAllUsersAbilities($userId)
     {
-        if(isset(self::$cache[$userId]['abilities']))
-        {
+        if (isset(self::$cache[$userId]['abilities'])) {
             return self::$cache[$userId]['abilities'];
         }
 
@@ -212,25 +220,29 @@ class PermissionService
      */
     private function cache($userId)
     {
-        $usersRoles     = $this->userRoleRepository->query()->where('user_id', $userId)->get();
-        $usersAbilities = $this->userAbilityRepository->query()->where('user_id', $userId)->get();
+        $usersRoles =
+            $this->userRoleRepository->query()
+                ->where('user_id', $userId)
+                ->get();
+        $usersAbilities =
+            $this->userAbilityRepository->query()
+                ->where('user_id', $userId)
+                ->get();
 
         self::$cache[$userId]['abilities'] = [];
-        self::$cache[$userId]['roles']     = [];
+        self::$cache[$userId]['roles'] = [];
 
         $usersRoles = $usersRoles->push(new Entity(['role' => 'user']));
 
-        foreach($usersRoles->pluck('role') as $usersRole)
-        {
+        foreach ($usersRoles->pluck('role') as $usersRole) {
             self::$cache[$userId]['roles'][] = $usersRole;
 
-            foreach(ConfigService::$roleAbilities[$usersRole] ?? [] as $roleAbility)
-            {
-                self::$cache[$userId]['abilities'][] = $roleAbility;
+            foreach (ConfigService::$roleAbilities[$usersRole] ?? [] as $roleAbilityIndex => $roleAbility) {
+                self::$cache[$userId]['abilities'][is_array($roleAbility) ? $roleAbilityIndex : $roleAbility] =
+                    $roleAbility;
             }
         }
-        foreach($usersAbilities->pluck('ability') as $userAbility)
-        {
+        foreach ($usersAbilities->pluck('ability') as $userAbility) {
             self::$cache[$userId]['abilities'][] = $userAbility;
         }
     }
@@ -256,11 +268,7 @@ class PermissionService
 
             $abilityConfig = ConfigService::$roleAbilities[$role] ?? [];
 
-            if (
-                !empty($abilityConfig) &&
-                isset($abilityConfig[$ability]) &&
-                is_array($abilityConfig[$ability])
-            ) {
+            if (!empty($abilityConfig) && isset($abilityConfig[$ability]) && is_array($abilityConfig[$ability])) {
 
                 $rules = $abilityConfig[$ability];
 
@@ -270,13 +278,17 @@ class PermissionService
 
                         $result += $input;
 
-                    } else if ($ruleType === 'only' && is_array($ruleValues)) {
+                    } else {
+                        if ($ruleType === 'only' && is_array($ruleValues)) {
 
-                        $result += Arr::only($input, $ruleValues);
+                            $result += Arr::only($input, $ruleValues);
 
-                    } else if ($ruleType === 'except' && is_array($ruleValues)) {
+                        } else {
+                            if ($ruleType === 'except' && is_array($ruleValues)) {
 
-                        $result += Arr::except($input, $ruleValues);
+                                $result += Arr::except($input, $ruleValues);
+                            }
+                        }
                     }
                 }
 
