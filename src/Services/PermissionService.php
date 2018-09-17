@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Railroad\Permissions\Exceptions\NotAllowedException;
 use Railroad\Permissions\Repositories\UserAbilityRepository;
 use Railroad\Permissions\Repositories\UserRoleRepository;
+use Railroad\Resora\Entities\Entity;
 
 class PermissionService
 {
@@ -216,6 +217,8 @@ class PermissionService
 
         self::$cache[$userId]['abilities'] = [];
         self::$cache[$userId]['roles']     = [];
+
+        $usersRoles = $usersRoles->push(new Entity(['role' => 'user']));
 
         foreach($usersRoles->pluck('role') as $usersRole)
         {
