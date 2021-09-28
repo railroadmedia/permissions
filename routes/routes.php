@@ -21,6 +21,11 @@ Route::group(
             Railroad\Permissions\Controllers\UserAbilityJsonController::class . '@delete'
         )->name('permissions.user-ability.delete');
 
+        Route::get(
+            '/user-role/{userId}',
+            Railroad\Permissions\Controllers\UserRoleJsonController::class . '@show'
+        )->name('permissions.user-role.show');
+
         Route::put(
             '/user-role',
             Railroad\Permissions\Controllers\UserRoleJsonController::class . '@store'

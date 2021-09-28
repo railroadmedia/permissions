@@ -30,6 +30,21 @@ class UserRoleJsonController extends Controller
     }
 
     /**
+     * @param $userId
+     * @return JsonResponse
+     */
+    public function show($userId)
+    {
+        $usersRoles =
+            $this->userRoleRepository->query()
+                ->where('user_id', $userId)
+                ->get()
+                ->toArray();
+
+        return new JsonResponse($usersRoles, 200);
+    }
+
+    /**
      * @param UserRoleCreateRequest $request
      * @return JsonResponse
      */
