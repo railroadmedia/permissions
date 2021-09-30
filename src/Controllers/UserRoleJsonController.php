@@ -8,7 +8,9 @@ use Illuminate\Routing\Controller;
 use Railroad\Permissions\Exceptions\NotFoundException;
 use Railroad\Permissions\Repositories\UserRoleRepository;
 use Railroad\Permissions\Requests\UserRoleCreateRequest;
+use Railroad\Permissions\Requests\UserRolesDeleteRequest;
 use Railroad\Permissions\Requests\UserRoleUpdateRequest;
+use Railroad\Permissions\Requests\UserRolesCreateRequest;
 use Railroad\Permissions\Responses\JsonResponse;
 use Throwable;
 
@@ -50,7 +52,7 @@ class UserRoleJsonController extends Controller
      */
     public function store(UserRoleCreateRequest $request)
     {
-        $ability = $this->userRoleRepository->create(
+        $role = $this->userRoleRepository->create(
             array_merge(
                 $request->only(['user_id', 'role']),
                 [
@@ -59,7 +61,28 @@ class UserRoleJsonController extends Controller
                 ]
         ));
 
-        return new JsonResponse($ability, 200);
+        return new JsonResponse($role, 200);
+    }
+
+    /**
+     * @param UserRolesCreateRequest $request
+     * @return JsonResponse
+     */
+    public function storeMultiple(UserRolesCreateRequest $request)
+    {
+        $userId = $request->input('user_id');
+        $roles = [];
+
+        foreach ($request->input('roles') as $role) {
+            $roles[] = $this->userRoleRepository->create([
+                    'user_id' => $userId,
+                    'role' => $role,
+                    'created_at' => Carbon::now()->toDateTimeString(),
+                    'updated_at' => Carbon::now()->toDateTimeString(),
+                ]);
+        }
+
+        return new JsonResponse($roles, 200);
     }
 
     /**
@@ -70,17 +93,17 @@ class UserRoleJsonController extends Controller
      */
     public function update(UserRoleUpdateRequest $request, $id)
     {
-        $ability = $this->userRoleRepository->update(
+        $role = $this->userRoleRepository->update(
             $id,
             $request->only(['user_id', 'role'])
         );
 
         throw_if(
-            is_null($ability),
+            is_null($role),
             new NotFoundException('Update failed, user role not found with id: ' . $id)
         );
 
-        return new JsonResponse($ability, 201);
+        return new JsonResponse($role, 201);
     }
 
     /**
@@ -91,6 +114,19 @@ class UserRoleJsonController extends Controller
     public function delete(Request $request, $id)
     {
         $deleted = $this->userRoleRepository->destroy($id);
+
+        return new JsonResponse(null, 204);
+    }
+
+    /**
+     * @param UserRolesDeleteRequest $request
+     * @return JsonResponse
+     */
+    public function deleteMultiple(UserRolesDeleteRequest $request)
+    {
+        foreach ($request->input('roles') as $roleId) {
+            $this->userRoleRepository->destroy($roleId);
+        }
 
         return new JsonResponse(null, 204);
     }
