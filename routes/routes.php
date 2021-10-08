@@ -21,6 +21,11 @@ Route::group(
             Railroad\Permissions\Controllers\UserAbilityJsonController::class . '@delete'
         )->name('permissions.user-ability.delete');
 
+        Route::get(
+            '/user-role/{userId}',
+            Railroad\Permissions\Controllers\UserRoleJsonController::class . '@show'
+        )->name('permissions.user-role.show');
+
         Route::put(
             '/user-role',
             Railroad\Permissions\Controllers\UserRoleJsonController::class . '@store'
@@ -28,8 +33,8 @@ Route::group(
 
         Route::put(
             '/user-roles',
-            Railroad\Permissions\Controllers\UserRoleJsonController::class . '@updateOrCreateMultiple'
-        )->name('permissions.user-role.update-or-create-multiple');
+            Railroad\Permissions\Controllers\UserRoleJsonController::class . '@storeMultiple'
+        )->name('permissions.user-role.store-multiple');
 
         Route::patch(
             '/user-role/{userRoleId}',
@@ -40,5 +45,10 @@ Route::group(
             '/user-role/{userRoleId}',
             Railroad\Permissions\Controllers\UserRoleJsonController::class . '@delete'
         )->name('permissions.user-role.delete');
+
+        Route::delete(
+            '/user-roles',
+            Railroad\Permissions\Controllers\UserRoleJsonController::class . '@deleteMultiple'
+        )->name('permissions.user-role.delete-multiple');
     });
 
