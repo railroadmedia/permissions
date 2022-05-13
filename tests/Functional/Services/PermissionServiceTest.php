@@ -15,7 +15,7 @@ class PermissionServiceTest extends PermissionsTestCase
      */
     protected $classBeingTested;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->classBeingTested = $this->app->make(PermissionService::class);

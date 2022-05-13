@@ -13,7 +13,7 @@ class UserRoleDecoratorTest extends PermissionsTestCase
      */
     protected $userRoleRepository;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->userRoleRepository = $this->app->make(UserRoleRepository::class);

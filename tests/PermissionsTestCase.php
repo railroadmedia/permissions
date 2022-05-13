@@ -26,7 +26,7 @@ class PermissionsTestCase extends BaseTestCase
      */
     protected $databaseManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -94,7 +94,7 @@ class PermissionsTestCase extends BaseTestCase
         $app->register(PermissionsServiceProvider::class);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
     }

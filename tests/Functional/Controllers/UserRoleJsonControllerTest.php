@@ -2,12 +2,15 @@
 
 namespace Railroad\Permissions\Tests\Functional\Controllers;
 
+use DMS\PHPUnitExtensions\ArraySubset\ArraySubsetAsserts;
 use Railroad\Permissions\Services\ConfigService;
 use Railroad\Permissions\Tests\PermissionsTestCase;
 
 class UserRoleJsonControllerTest extends PermissionsTestCase
 {
-    public function setUp()
+    use ArraySubsetAsserts;
+
+    public function setUp(): void
     {
         parent::setUp();
     }

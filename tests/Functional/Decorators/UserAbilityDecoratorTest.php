@@ -13,7 +13,7 @@ class UserAbilityDecoratorTest extends PermissionsTestCase
      */
     protected $userAbilityRepository;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->userAbilityRepository = $this->app->make(UserAbilityRepository::class);
